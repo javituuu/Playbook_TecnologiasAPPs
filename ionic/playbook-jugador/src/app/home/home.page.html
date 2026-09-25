@@ -1,27 +1,86 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Mi Agenda</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>
+      <span *ngIf="pestanaActiva === 'agenda'">Mi Agenda</span>
+      <span *ngIf="pestanaActiva === 'citaciones'">Mis Citaciones</span>
+      <span *ngIf="pestanaActiva === 'perfil'">Mi Perfil</span>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="page-wrap">
-    <ion-card>
-      <ion-img src="assets/cancha.png" alt="Cancha"></ion-img>
-      <ion-card-header>
-        <ion-card-subtitle>Próxima Partida</ion-card-subtitle>
-        <ion-card-title>UDD vs UNAB</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>Viernes 16:00 · Estadio Municipal · Cancha 2</ion-card-content>
-    </ion-card>
+  <div class="page-wrap" style="padding: 16px;">
 
-    <ion-list>
-      <ion-item *ngFor="let p of partidos">
-        <ion-label>{{ p.rival }}</ion-label>
-        <ion-label slot="end">{{ p.hora }}</ion-label>
-      </ion-item>
-    </ion-list>
+    <!-- 1. VISTA AGENDA -->
+    <div *ngIf="pestanaActiva === 'agenda'">
+      <ion-card>
+        <ion-img src="assets/cancha.png" alt="Cancha"></ion-img>
+        <ion-card-header>
+          <ion-card-subtitle>Próxima Partida</ion-card-subtitle>
+          <ion-card-title>UDD vs UNAB</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>Viernes 16:00 · Estadio Municipal · Cancha 2</ion-card-content>
+      </ion-card>
 
-    <ion-button expand="block" (click)="confirmar()">Confirmar Citación</ion-button>
+      <ion-list>
+        <ion-item *ngFor="let p of partidos">
+          <ion-label>{{ p.rival }}</ion-label>
+          <ion-label slot="end">{{ p.hora }}</ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ion-button expand="block" (click)="confirmar()">Confirmar Citación</ion-button>
+    </div>
+
+    <!-- 2. VISTA CITACIONES -->
+    <div *ngIf="pestanaActiva === 'citaciones'">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-subtitle>Invitación Pendiente</ion-card-subtitle>
+          <ion-card-title>Torneo Interfacultades LoL</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          El Coach te ha citado para el partido del Sábado a las 20:00 hrs.
+        </ion-card-content>
+      </ion-card>
+      <ion-button expand="block" color="success">Aceptar Citación</ion-button>
+      <ion-button expand="block" fill="outline" color="danger" style="margin-top: 8px;">Rechazar</ion-button>
+    </div>
+
+    <!-- 3. VISTA PERFIL -->
+    <div *ngIf="pestanaActiva === 'perfil'">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Jugador Generico</ion-card-title>
+          <ion-card-subtitle>Jugador · Universidad De Dioses (UDD)</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Disciplina:</strong> League of Legends</p>
+          <p><strong>Rol:</strong> Top Laner / Rango Hierro 4</p>
+          <p><strong>Estado:</strong> Activo en el plantel</p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
   </div>
 </ion-content>
+
+<!-- BARRA INFERIOR (TABS) -->
+<ion-footer>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button (click)="cambiarPestana('agenda')" [selected]="pestanaActiva === 'agenda'">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-label>Agenda</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="cambiarPestana('citaciones')" [selected]="pestanaActiva === 'citaciones'">
+      <ion-icon name="mail-unread-outline"></ion-icon>
+      <ion-label>Citaciones</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="cambiarPestana('perfil')" [selected]="pestanaActiva === 'perfil'">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Perfil</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
