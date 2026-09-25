@@ -1,0 +1,27 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mi Agenda</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-wrap">
+    <ion-card>
+      <ion-img src="assets/cancha.png" alt="Cancha"></ion-img>
+      <ion-card-header>
+        <ion-card-subtitle>Próxima Partida</ion-card-subtitle>
+        <ion-card-title>UDD vs UNAB</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>Viernes 16:00 · Estadio Municipal · Cancha 2</ion-card-content>
+    </ion-card>
+
+    <ion-list>
+      <ion-item *ngFor="let p of partidos">
+        <ion-label>{{ p.rival }}</ion-label>
+        <ion-label slot="end">{{ p.hora }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" (click)="confirmar()">Confirmar Citación</ion-button>
+  </div>
+</ion-content>
