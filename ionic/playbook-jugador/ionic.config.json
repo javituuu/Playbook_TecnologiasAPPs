@@ -1,0 +1,7 @@
+{
+  "name": "playbook-jugador",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
