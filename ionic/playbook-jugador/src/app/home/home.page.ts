@@ -1,6 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonImg, IonCard,
   IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
@@ -9,6 +8,7 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { calendarOutline, mailUnreadOutline, personOutline } from 'ionicons/icons';
+import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.service';
 
 @Component({
   selector: 'app-home',
@@ -32,16 +32,19 @@ export class HomePage implements OnInit {
   errorPerfil: boolean = false;
 
   // --- Estados de Agenda ---
-  agenda: any[] = [];
+  agenda: AgendaItem[] = [];
   cargandoAgenda: boolean = true;
   errorAgenda: boolean = false;
 
   // --- Estados de Citaciones ---
-  citaciones: any[] = [];
+  citaciones: CitacionItem[] = [];
   cargandoCitaciones: boolean = true;
   errorCitaciones: boolean = false;
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {
+  constructor(
+    private jugadorService: JugadorService,
+    private cdr: ChangeDetectorRef
+  ) {
     addIcons({ calendarOutline, mailUnreadOutline, personOutline });
   }
 
@@ -52,13 +55,13 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Obtiene la información del perfil del jugador y sus horarios bloqueados.
+   * Obtiene la información del perfil del jugador y sus horarios bloqueados a través del servicio.
    */
   cargarPerfil() {
     this.cargandoPerfil = true;
     this.errorPerfil = false;
-    this.http.get('http://localhost:8000/api/perfil').subscribe({
-      next: (res: any) => {
+    this.jugadorService.getPerfil().subscribe({
+      next: (res) => {
         this.perfil = res.data;
         this.cargandoPerfil = false;
         this.cdr.detectChanges();
@@ -72,13 +75,13 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Obtiene la lista de partidos donde el jugador ha confirmado su asistencia.
+   * Obtiene la lista de partidos confirmados a través del servicio.
    */
   cargarAgenda() {
     this.cargandoAgenda = true;
     this.errorAgenda = false;
-    this.http.get('http://localhost:8000/api/agenda').subscribe({
-      next: (res: any) => {
+    this.jugadorService.getAgenda().subscribe({
+      next: (res) => {
         this.agenda = res.data;
         this.cargandoAgenda = false;
         this.cdr.detectChanges();
@@ -92,13 +95,13 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Obtiene las invitaciones a partidos que están pendientes de respuesta.
+   * Obtiene las invitaciones a partidos pendientes de respuesta a través del servicio.
    */
   cargarCitaciones() {
     this.cargandoCitaciones = true;
     this.errorCitaciones = false;
-    this.http.get('http://localhost:8000/api/citaciones').subscribe({
-      next: (res: any) => {
+    this.jugadorService.getCitaciones().subscribe({
+      next: (res) => {
         this.citaciones = res.data;
         this.cargandoCitaciones = false;
         this.cdr.detectChanges();
@@ -112,12 +115,12 @@ export class HomePage implements OnInit {
   }
 
   /**
-   * Envía la respuesta (Aceptar/Rechazar) para una citación específica.
+   * Envía la respuesta (Aceptar/Rechazar) a través del servicio con validación.
    * @param idCitacion ID de la citación a actualizar
    * @param estado Estado de respuesta ('confirmado' o 'rechazado')
    */
-  responderCitacion(idCitacion: number, estado: string) {
-    this.http.patch(`http://localhost:8000/api/citaciones/${idCitacion}/responder`, { estado }).subscribe({
+  responderCitacion(idCitacion: number, estado: 'confirmado' | 'rechazado') {
+    this.jugadorService.responderCitacion(idCitacion, estado).subscribe({
       next: () => {
         // Remover visualmente la citación respondida de la lista de pendientes
         this.citaciones = this.citaciones.filter(c => c.id_citacion !== idCitacion);
@@ -129,8 +132,8 @@ export class HomePage implements OnInit {
         
         this.cdr.detectChanges();
       },
-      error: () => {
-        alert('Error al conectar con el servidor. Intente de nuevo.');
+      error: (err) => {
+        alert(err.message || 'Error al conectar con el servidor.');
       }
     });
   }
