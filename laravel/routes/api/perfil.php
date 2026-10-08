@@ -12,7 +12,7 @@ Route::get('/perfil', function () {
     
     $bloqueos = DB::table('bloqueos_horarios')
         ->where('user_id', $user->id)
-        ->select('dia_semana', 'hora_inicio', 'hora_fin')
+        ->select('id', 'dia_semana', 'hora_inicio', 'hora_fin')
         ->get();
 
     return response()->json([

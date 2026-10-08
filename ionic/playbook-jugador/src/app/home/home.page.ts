@@ -1,13 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonImg, IonCard,
   IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
   IonList, IonItem, IonLabel, IonButton, IonFooter, IonTabBar,
-  IonTabButton, IonIcon, IonSpinner,
+  IonTabButton, IonIcon, IonSpinner, IonInput, IonSelect, IonSelectOption,
+  ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { calendarOutline, mailUnreadOutline, personOutline } from 'ionicons/icons';
+import { calendarOutline, mailUnreadOutline, personOutline, trashOutline, addOutline } from 'ionicons/icons';
 import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.service';
 
 @Component({
@@ -15,11 +17,11 @@ import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.se
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [
-    NgFor, NgIf, DatePipe,
+    NgFor, NgIf, DatePipe, FormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent, IonImg, IonCard,
     IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
     IonList, IonItem, IonLabel, IonButton, IonFooter, IonTabBar,
-    IonTabButton, IonIcon, IonSpinner,
+    IonTabButton, IonIcon, IonSpinner, IonInput, IonSelect, IonSelectOption
   ],
 })
 export class HomePage implements OnInit {
@@ -41,11 +43,21 @@ export class HomePage implements OnInit {
   cargandoCitaciones: boolean = true;
   errorCitaciones: boolean = false;
 
+  // --- CRUD Horarios Bloqueados ---
+  mostrandoFormulario: boolean = false;
+  guardandoBloqueo: boolean = false;
+  nuevoBloqueo = {
+    dia_semana: '',
+    hora_inicio: '',
+    hora_fin: ''
+  };
+
   constructor(
     private jugadorService: JugadorService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastController: ToastController
   ) {
-    addIcons({ calendarOutline, mailUnreadOutline, personOutline });
+    addIcons({ calendarOutline, mailUnreadOutline, personOutline, trashOutline, addOutline });
   }
 
   ngOnInit() {
@@ -145,5 +157,66 @@ export class HomePage implements OnInit {
   cambiarPestana(nombre: string) {
     this.pestanaActiva = nombre;
     this.cdr.detectChanges();
+  }
+
+  // ==========================================
+  // MANTENEDOR CRUD: HORARIOS BLOQUEADOS
+  // ==========================================
+
+  mostrarFormulario() {
+    this.mostrandoFormulario = true;
+    this.nuevoBloqueo = { dia_semana: '', hora_inicio: '', hora_fin: '' };
+    this.cdr.detectChanges();
+  }
+
+  cancelarFormulario() {
+    this.mostrandoFormulario = false;
+    this.cdr.detectChanges();
+  }
+
+  async guardarBloqueo() {
+    if (!this.nuevoBloqueo.dia_semana || !this.nuevoBloqueo.hora_inicio || !this.nuevoBloqueo.hora_fin) {
+      this.mostrarMensaje('Por favor, completa todos los campos.', 'warning');
+      return;
+    }
+
+    this.guardandoBloqueo = true;
+    this.cdr.detectChanges();
+
+    this.jugadorService.crearBloqueo(this.nuevoBloqueo).subscribe({
+      next: (res) => {
+        this.mostrarMensaje('Horario bloqueado exitosamente', 'success');
+        this.mostrandoFormulario = false;
+        this.guardandoBloqueo = false;
+        this.cargarPerfil(); // Recargar la lista
+      },
+      error: (err) => {
+        this.mostrarMensaje(err.message || 'Error al guardar el bloqueo.', 'danger');
+        this.guardandoBloqueo = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  eliminarBloqueo(id: number) {
+    this.jugadorService.borrarBloqueo(id).subscribe({
+      next: () => {
+        this.mostrarMensaje('Bloqueo eliminado correctamente', 'success');
+        this.cargarPerfil(); // Recargar la lista
+      },
+      error: (err) => {
+        this.mostrarMensaje(err.message || 'Error al eliminar.', 'danger');
+      }
+    });
+  }
+
+  async mostrarMensaje(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2500,
+      color: color,
+      position: 'bottom'
+    });
+    toast.present();
   }
 }

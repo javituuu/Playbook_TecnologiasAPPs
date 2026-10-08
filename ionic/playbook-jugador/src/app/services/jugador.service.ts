@@ -15,6 +15,7 @@ export interface PerfilResponse {
     rango: string;
     estado: string;
     horarios_bloqueados: Array<{
+      id: number;
       dia_semana: string;
       hora_inicio: string;
       hora_fin: string;
@@ -90,6 +91,24 @@ export class JugadorService {
     }
 
     return this.http.patch<any>(`${this.apiUrl}/citaciones/${idCitacion}/responder`, { estado }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Crea un nuevo bloqueo de horario.
+   */
+  crearBloqueo(datos: { dia_semana: string, hora_inicio: string, hora_fin: string }): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/bloqueos`, datos).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * Elimina un bloqueo de horario existente.
+   */
+  borrarBloqueo(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/bloqueos/${id}`).pipe(
       catchError(this.handleError)
     );
   }

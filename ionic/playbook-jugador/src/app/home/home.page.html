@@ -106,11 +106,52 @@
             <p><strong>Rol:</strong> {{ perfil.rol }} / Rango {{ perfil.rango }}</p>
             <p><strong>Estado:</strong> {{ perfil.estado }}</p>
             
-            <h3 style="margin-top: 16px;">Horarios Bloqueados</h3>
+            <h3 style="margin-top: 16px;">
+              Horarios Bloqueados
+              <ion-button fill="clear" size="small" style="float: right;" (click)="mostrarFormulario()" *ngIf="!mostrandoFormulario">
+                <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </h3>
+
+            <!-- Formulario de Creación -->
+            <div *ngIf="mostrandoFormulario" style="background: #f4f5f8; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+              <ion-item>
+                <ion-select label="Día" placeholder="Seleccionar" [(ngModel)]="nuevoBloqueo.dia_semana">
+                  <ion-select-option value="Lunes">Lunes</ion-select-option>
+                  <ion-select-option value="Martes">Martes</ion-select-option>
+                  <ion-select-option value="Miércoles">Miércoles</ion-select-option>
+                  <ion-select-option value="Jueves">Jueves</ion-select-option>
+                  <ion-select-option value="Viernes">Viernes</ion-select-option>
+                  <ion-select-option value="Sábado">Sábado</ion-select-option>
+                  <ion-select-option value="Domingo">Domingo</ion-select-option>
+                </ion-select>
+              </ion-item>
+              
+              <ion-item>
+                <ion-input label="Desde" type="time" [(ngModel)]="nuevoBloqueo.hora_inicio"></ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-input label="Hasta" type="time" [(ngModel)]="nuevoBloqueo.hora_fin"></ion-input>
+              </ion-item>
+
+              <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                <ion-button fill="clear" color="medium" (click)="cancelarFormulario()">Cancelar</ion-button>
+                <ion-button color="primary" (click)="guardarBloqueo()" [disabled]="guardandoBloqueo">
+                  <ion-spinner name="dots" *ngIf="guardandoBloqueo"></ion-spinner>
+                  <span *ngIf="!guardandoBloqueo">Guardar</span>
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- Lista de Bloqueos -->
             <ion-list>
               <ion-item *ngFor="let h of perfil.horarios_bloqueados">
                 <ion-label>{{ h.dia_semana }}</ion-label>
-                <ion-label slot="end">{{ h.hora_inicio }} - {{ h.hora_fin }}</ion-label>
+                <ion-label slot="end" style="margin-right: 15px;">{{ h.hora_inicio }} - {{ h.hora_fin }}</ion-label>
+                <ion-button slot="end" fill="clear" color="danger" (click)="eliminarBloqueo(h.id)">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
               </ion-item>
             </ion-list>
           </ion-card-content>
