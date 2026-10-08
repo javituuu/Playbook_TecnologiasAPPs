@@ -1,27 +1,183 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Mi Agenda</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>
+      <span *ngIf="pestanaActiva === 'agenda'">Mi Agenda</span>
+      <span *ngIf="pestanaActiva === 'citaciones'">Mis Citaciones</span>
+      <span *ngIf="pestanaActiva === 'perfil'">Mi Perfil</span>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <div class="page-wrap">
-    <ion-card>
-      <ion-img src="assets/cancha.png" alt="Cancha"></ion-img>
-      <ion-card-header>
-        <ion-card-subtitle>Próxima Partida</ion-card-subtitle>
-        <ion-card-title>UDD vs UNAB</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>Viernes 16:00 · Estadio Municipal · Cancha 2</ion-card-content>
-    </ion-card>
+  <div class="page-wrap" style="padding: 16px;">
 
-    <ion-list>
-      <ion-item *ngFor="let p of partidos">
-        <ion-label>{{ p.rival }}</ion-label>
-        <ion-label slot="end">{{ p.hora }}</ion-label>
-      </ion-item>
-    </ion-list>
+    <!-- 1. VISTA AGENDA -->
+    <div *ngIf="pestanaActiva === 'agenda'">
+      <!-- Loading State -->
+      <div *ngIf="cargandoAgenda" class="ion-text-center">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando agenda...</p>
+      </div>
 
-    <ion-button expand="block" (click)="confirmar()">Confirmar Citación</ion-button>
+      <!-- Error State -->
+      <div *ngIf="errorAgenda" class="ion-text-center">
+        <p>Error al cargar la agenda. Intenta más tarde.</p>
+        <ion-button (click)="cargarAgenda()" fill="outline">Reintentar</ion-button>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!cargandoAgenda && !errorAgenda">
+        <ion-card *ngIf="agenda.length > 0">
+          <ion-img src="assets/cancha.png" alt="Cancha"></ion-img>
+          <ion-card-header>
+            <ion-card-subtitle>{{ agenda[0].liga }}</ion-card-subtitle>
+            <ion-card-title>{{ agenda[0].equipo_local }} vs {{ agenda[0].equipo_visitante }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>{{ agenda[0].fecha_hora | date:'short' }} · {{ agenda[0].lugar }}</ion-card-content>
+        </ion-card>
+
+        <ion-list *ngIf="agenda.length > 1">
+          <ion-item *ngFor="let p of agenda.slice(1)">
+            <ion-label>{{ p.equipo_local }} vs {{ p.equipo_visitante }}</ion-label>
+            <ion-label slot="end">{{ p.fecha_hora | date:'shortTime' }}</ion-label>
+          </ion-item>
+        </ion-list>
+        
+        <p *ngIf="agenda.length === 0">No tienes partidos programados.</p>
+      </div>
+    </div>
+
+    <!-- 2. VISTA CITACIONES -->
+    <div *ngIf="pestanaActiva === 'citaciones'">
+      <!-- Loading State -->
+      <div *ngIf="cargandoCitaciones" class="ion-text-center">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando citaciones...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorCitaciones" class="ion-text-center">
+        <p>Error al cargar las citaciones.</p>
+        <ion-button (click)="cargarCitaciones()" fill="outline">Reintentar</ion-button>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!cargandoCitaciones && !errorCitaciones">
+        <p *ngIf="citaciones.length === 0">No tienes citaciones pendientes.</p>
+        <div *ngFor="let cit of citaciones">
+          <ion-card>
+            <ion-card-header>
+              <ion-card-subtitle>Invitación Pendiente</ion-card-subtitle>
+              <ion-card-title>{{ cit.liga }} vs {{ cit.equipo_rival }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              {{ cit.mensaje_coach }}
+            </ion-card-content>
+          </ion-card>
+          <ion-button expand="block" color="success" (click)="responderCitacion(cit.id_citacion, 'confirmado')">Aceptar Citación</ion-button>
+          <ion-button expand="block" fill="outline" color="danger" style="margin-top: 8px;" (click)="responderCitacion(cit.id_citacion, 'rechazado')">Rechazar</ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. VISTA PERFIL -->
+    <div *ngIf="pestanaActiva === 'perfil'">
+      <!-- Loading State -->
+      <div *ngIf="cargandoPerfil" class="ion-text-center">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando perfil...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorPerfil" class="ion-text-center">
+        <p>Error al cargar el perfil.</p>
+        <ion-button (click)="cargarPerfil()" fill="outline">Reintentar</ion-button>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!cargandoPerfil && !errorPerfil && perfil">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>{{ perfil.nombre_completo }}</ion-card-title>
+            <ion-card-subtitle>Jugador · {{ perfil.club_actual }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Disciplina:</strong> {{ perfil.disciplina }}</p>
+            <p><strong>Rol:</strong> {{ perfil.rol }} / Rango {{ perfil.rango }}</p>
+            <p><strong>Estado:</strong> {{ perfil.estado }}</p>
+            
+            <h3 style="margin-top: 16px;">
+              Horarios Bloqueados
+              <ion-button fill="clear" size="small" style="float: right;" (click)="mostrarFormulario()" *ngIf="!mostrandoFormulario">
+                <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </h3>
+
+            <!-- Formulario de Creación -->
+            <div *ngIf="mostrandoFormulario" style="background: #f4f5f8; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+              <ion-item>
+                <ion-select label="Día" placeholder="Seleccionar" [(ngModel)]="nuevoBloqueo.dia_semana">
+                  <ion-select-option value="Lunes">Lunes</ion-select-option>
+                  <ion-select-option value="Martes">Martes</ion-select-option>
+                  <ion-select-option value="Miércoles">Miércoles</ion-select-option>
+                  <ion-select-option value="Jueves">Jueves</ion-select-option>
+                  <ion-select-option value="Viernes">Viernes</ion-select-option>
+                  <ion-select-option value="Sábado">Sábado</ion-select-option>
+                  <ion-select-option value="Domingo">Domingo</ion-select-option>
+                </ion-select>
+              </ion-item>
+              
+              <ion-item>
+                <ion-input label="Desde" type="time" [(ngModel)]="nuevoBloqueo.hora_inicio"></ion-input>
+              </ion-item>
+              
+              <ion-item>
+                <ion-input label="Hasta" type="time" [(ngModel)]="nuevoBloqueo.hora_fin"></ion-input>
+              </ion-item>
+
+              <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                <ion-button fill="clear" color="medium" (click)="cancelarFormulario()">Cancelar</ion-button>
+                <ion-button color="primary" (click)="guardarBloqueo()" [disabled]="guardandoBloqueo">
+                  <ion-spinner name="dots" *ngIf="guardandoBloqueo"></ion-spinner>
+                  <span *ngIf="!guardandoBloqueo">Guardar</span>
+                </ion-button>
+              </div>
+            </div>
+
+            <!-- Lista de Bloqueos -->
+            <ion-list>
+              <ion-item *ngFor="let h of perfil.horarios_bloqueados">
+                <ion-label>{{ h.dia_semana }}</ion-label>
+                <ion-label slot="end" style="margin-right: 15px;">{{ h.hora_inicio }} - {{ h.hora_fin }}</ion-label>
+                <ion-button slot="end" fill="clear" color="danger" (click)="eliminarBloqueo(h.id)">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
   </div>
 </ion-content>
+
+<!-- BARRA INFERIOR (TABS) -->
+<ion-footer>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button (click)="cambiarPestana('agenda')" [selected]="pestanaActiva === 'agenda'">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <ion-label>Agenda</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="cambiarPestana('citaciones')" [selected]="pestanaActiva === 'citaciones'">
+      <ion-icon name="mail-unread-outline"></ion-icon>
+      <ion-label>Citaciones</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button (click)="cambiarPestana('perfil')" [selected]="pestanaActiva === 'perfil'">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Perfil</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>
