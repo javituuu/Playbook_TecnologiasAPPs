@@ -1,0 +1,21 @@
+<ion-tabs>
+  <ion-router-outlet></ion-router-outlet>
+  <ion-tab-bar slot="bottom" aria-label="Navegación principal">
+    <ion-tab-button tab="agenda" href="/tabs/agenda">
+      <ion-icon [icon]="calendarOutline"></ion-icon>
+      <ion-label>Agenda</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="equipo" href="/tabs/equipo">
+      <ion-icon [icon]="peopleOutline"></ion-icon>
+      <ion-label>Equipo</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="entrenamiento" href="/tabs/entrenamiento">
+      <ion-icon [icon]="barbellOutline"></ion-icon>
+      <ion-label>Entreno</ion-label>
+    </ion-tab-button>
+    <ion-tab-button tab="perfil" href="/tabs/perfil">
+      <ion-icon [icon]="personCircleOutline"></ion-icon>
+      <ion-label>Perfil</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
