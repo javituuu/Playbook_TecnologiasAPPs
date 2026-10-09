@@ -4,10 +4,7 @@ use App\Models\Citacion;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
-/**
- * Microservicio: Agenda del Jugador
- * Retorna la lista de partidos en los cuales el jugador tiene una citación "confirmada".
- */
+// Agenda = partidos donde ya confirmó su citación.
 Route::get('/agenda', function () {
     $user = User::where('email', 'javier@email.com')->first();
 

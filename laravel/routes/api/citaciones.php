@@ -5,10 +5,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/**
- * Microservicio: Citaciones del Jugador
- * Retorna las invitaciones a partidos que están pendientes de respuesta ('pendiente').
- */
+// Citaciones que el jugador todavía no responde.
 Route::get('/citaciones', function () {
     $user = User::where('email', 'javier@email.com')->first();
 
@@ -32,19 +29,15 @@ Route::get('/citaciones', function () {
     ]);
 });
 
-/**
- * Microservicio: Responder Citación
- * Permite cambiar el estado de una citación específica ('confirmado' o 'rechazado').
- */
+// Responde una citación con 'confirmado' o 'rechazado'.
+// Ojo: no revisa que siga pendiente ni que sea del jugador, actualiza cualquier id que le llegue.
 Route::patch('/citaciones/{id}/responder', function ($id, Request $request) {
     $estado = $request->input('estado');
 
-    // Validación de estado
     if (!in_array($estado, ['confirmado', 'rechazado'])) {
         return response()->json(['status' => 'error', 'message' => 'Estado inválido'], 400);
     }
 
-    // Actualización de registro
     Citacion::where('id', $id)->update(['estado_respuesta' => $estado]);
 
     return response()->json(['status' => 'success', 'message' => 'Citación actualizada exitosamente']);

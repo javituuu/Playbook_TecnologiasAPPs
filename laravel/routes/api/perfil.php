@@ -4,10 +4,8 @@ use App\Models\BloqueoHorario;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
-/**
- * Microservicio: Perfil del Jugador
- * Retorna los datos básicos del usuario y sus bloqueos de horario asociados.
- */
+// Perfil del jugador + sus bloqueos de horario.
+// Por ahora no hay login, así que todas las rutas trabajan con Javier fijo.
 Route::get('/perfil', function () {
     $user = User::where('email', 'javier@email.com')->first();
 
@@ -17,6 +15,7 @@ Route::get('/perfil', function () {
     return response()->json([
         "status" => "success",
         "data" => [
+            // Club, disciplina, rol y rango van a mano por ahora, todavía no están en la BD.
             "id" => $user->id,
             "nombre_completo" => $user->name,
             "email" => $user->email,

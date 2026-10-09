@@ -25,25 +25,25 @@ import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.se
   ],
 })
 export class HomePage implements OnInit {
-  /** Pestaña activa por defecto en el menú inferior */
+  /** Las pestañas no son rutas, esta variable decide qué bloque se ve. */
   pestanaActiva: string = 'agenda';
 
-  // --- Estados de Perfil ---
+  // Perfil: carga, error y datos
   perfil: any = null;
   cargandoPerfil: boolean = true;
   errorPerfil: boolean = false;
 
-  // --- Estados de Agenda ---
+  // Agenda: carga, error y datos
   agenda: AgendaItem[] = [];
   cargandoAgenda: boolean = true;
   errorAgenda: boolean = false;
 
-  // --- Estados de Citaciones ---
+  // Citaciones: carga, error y datos
   citaciones: CitacionItem[] = [];
   cargandoCitaciones: boolean = true;
   errorCitaciones: boolean = false;
 
-  // --- CRUD Horarios Bloqueados ---
+  // Formulario de bloqueos de horario
   mostrandoFormulario: boolean = false;
   guardandoBloqueo: boolean = false;
   nuevoBloqueo = {
@@ -66,9 +66,6 @@ export class HomePage implements OnInit {
     this.cargarCitaciones();
   }
 
-  /**
-   * Obtiene la información del perfil del jugador y sus horarios bloqueados a través del servicio.
-   */
   cargarPerfil() {
     this.cargandoPerfil = true;
     this.errorPerfil = false;
@@ -86,9 +83,6 @@ export class HomePage implements OnInit {
     });
   }
 
-  /**
-   * Obtiene la lista de partidos confirmados a través del servicio.
-   */
   cargarAgenda() {
     this.cargandoAgenda = true;
     this.errorAgenda = false;
@@ -106,9 +100,6 @@ export class HomePage implements OnInit {
     });
   }
 
-  /**
-   * Obtiene las invitaciones a partidos pendientes de respuesta a través del servicio.
-   */
   cargarCitaciones() {
     this.cargandoCitaciones = true;
     this.errorCitaciones = false;
@@ -126,18 +117,13 @@ export class HomePage implements OnInit {
     });
   }
 
-  /**
-   * Envía la respuesta (Aceptar/Rechazar) a través del servicio con validación.
-   * @param idCitacion ID de la citación a actualizar
-   * @param estado Estado de respuesta ('confirmado' o 'rechazado')
-   */
   responderCitacion(idCitacion: number, estado: 'confirmado' | 'rechazado') {
     this.jugadorService.responderCitacion(idCitacion, estado).subscribe({
       next: () => {
-        // Remover visualmente la citación respondida de la lista de pendientes
+        // Ya no está pendiente, la sacamos de la lista sin volver a pedirla
         this.citaciones = this.citaciones.filter(c => c.id_citacion !== idCitacion);
         
-        // Si el jugador confirmó, recargar la agenda para reflejar el nuevo partido
+        // Al confirmar pasa a la agenda, así que la volvemos a pedir
         if (estado === 'confirmado') {
           this.cargarAgenda();
         }
@@ -151,18 +137,12 @@ export class HomePage implements OnInit {
     });
   }
 
-  /**
-   * Cambia la vista activa del dashboard.
-   * @param nombre Nombre de la pestaña seleccionada ('agenda', 'citaciones' o 'perfil')
-   */
   cambiarPestana(nombre: string) {
     this.pestanaActiva = nombre;
     this.cdr.detectChanges();
   }
 
-  // ==========================================
-  // MANTENEDOR CRUD: HORARIOS BLOQUEADOS
-  // ==========================================
+  // Mantenedor de horarios bloqueados
 
   mostrarFormulario() {
     this.mostrandoFormulario = true;
@@ -189,7 +169,7 @@ export class HomePage implements OnInit {
         this.mostrarMensaje('Horario bloqueado exitosamente', 'success');
         this.mostrandoFormulario = false;
         this.guardandoBloqueo = false;
-        this.cargarPerfil(); // Recargar la lista
+        this.cargarPerfil(); // Los bloqueos vienen dentro del perfil, por eso recargamos eso
       },
       error: (err) => {
         this.mostrarMensaje(err.message || 'Error al guardar el bloqueo.', 'danger');
@@ -203,7 +183,7 @@ export class HomePage implements OnInit {
     this.jugadorService.borrarBloqueo(id).subscribe({
       next: () => {
         this.mostrarMensaje('Bloqueo eliminado correctamente', 'success');
-        this.cargarPerfil(); // Recargar la lista
+        this.cargarPerfil(); // Los bloqueos vienen dentro del perfil, por eso recargamos eso
       },
       error: (err) => {
         this.mostrarMensaje(err.message || 'Error al eliminar.', 'danger');

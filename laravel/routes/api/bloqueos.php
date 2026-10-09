@@ -5,13 +5,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/**
- * Microservicio: Bloqueos de Horario (Mantenedor CRUD)
- */
+// Mantenedor (crear / borrar) de los bloqueos de horario.
 
-// CREAR un bloqueo
 Route::post('/bloqueos', function (Request $request) {
-    // Validar requerimientos básicos
     $request->validate([
         'dia_semana' => 'required|string',
         'hora_inicio' => 'required',
@@ -34,8 +30,9 @@ Route::post('/bloqueos', function (Request $request) {
     ]);
 });
 
-// ELIMINAR un bloqueo
 Route::delete('/bloqueos/{id}', function ($id) {
+    // destroy() devuelve cuántos borró, así que 0 = el id no existe.
+    // Ojo que tampoco revisa que el bloqueo sea del jugador.
     if (BloqueoHorario::destroy($id)) {
         return response()->json(['status' => 'success', 'message' => 'Horario desbloqueado exitosamente']);
     }

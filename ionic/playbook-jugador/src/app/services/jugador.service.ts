@@ -47,45 +47,34 @@ export interface CitacionItem {
   providedIn: 'root'
 })
 export class JugadorService {
-  /** URL base para comunicarse con la API de Laravel */
+  /** Es el `php artisan serve` local, puerto 8000. */
   private readonly apiUrl = 'http://localhost:8000/api';
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Obtiene el perfil del jugador y sus horarios bloqueados.
-   */
   getPerfil(): Observable<PerfilResponse> {
     return this.http.get<PerfilResponse>(`${this.apiUrl}/perfil`).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Obtiene la agenda de partidos confirmados.
-   */
+  /** Solo partidos con citación confirmada. */
   getAgenda(): Observable<{ status: string; data: AgendaItem[] }> {
     return this.http.get<{ status: string; data: AgendaItem[] }>(`${this.apiUrl}/agenda`).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Obtiene las citaciones pendientes de respuesta.
-   */
+  /** Solo citaciones sin responder. */
   getCitaciones(): Observable<{ status: string; data: CitacionItem[] }> {
     return this.http.get<{ status: string; data: CitacionItem[] }>(`${this.apiUrl}/citaciones`).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Responde a una citación con validación de condición previa.
-   * @param idCitacion ID de la citación a actualizar
-   * @param estado Estado de respuesta ('confirmado' o 'rechazado')
-   */
+
   responderCitacion(idCitacion: number, estado: 'confirmado' | 'rechazado'): Observable<any> {
-    // Operación condicional: Validar que el estado sea válido antes de enviar
+    // Si el estado es otro el backend responde 400, así que ni hacemos la llamada.
     if (estado !== 'confirmado' && estado !== 'rechazado') {
       return throwError(() => new Error('Estado inválido. Debe ser "confirmado" o "rechazado".'));
     }
@@ -95,35 +84,27 @@ export class JugadorService {
     );
   }
 
-  /**
-   * Crea un nuevo bloqueo de horario.
-   */
   crearBloqueo(datos: { dia_semana: string, hora_inicio: string, hora_fin: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/bloqueos`, datos).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Elimina un bloqueo de horario existente.
-   */
   borrarBloqueo(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/bloqueos/${id}`).pipe(
       catchError(this.handleError)
     );
   }
 
-  /**
-   * Manejador centralizado de errores HTTP.
-   */
+  /** Deja todos los fallos HTTP como un Error con mensaje listo para mostrar en el toast. */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let mensajeError = 'Ocurrió un error inesperado al conectar con el servidor.';
 
     if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
+      // Ni llegó al servidor (red caída, CORS...)
       mensajeError = `Error del cliente: ${error.error.message}`;
     } else {
-      // Error del lado del servidor (código 4xx o 5xx)
+      // Llegó al servidor y respondió 4xx o 5xx
       mensajeError = `Error ${error.status}: ${error.message || 'Fallo en la API'}`;
     }
 
