@@ -1,0 +1,19 @@
+<ion-header><ion-toolbar><ion-title>Entreno</ion-title></ion-toolbar></ion-header>
+<ion-content>
+  <main class="page-wrap">
+    <p class="eyebrow">Jueves · Bloque de equipo</p>
+    <h1>Plan de entrenamiento</h1>
+    <div class="training-hero"><img src="assets/training-photo.jpg" alt="Estación de videojuegos preparada para entrenar" /><div><span>Sesión de hoy</span><strong>Preparación de torneo</strong><small>90 min · Valorant</small></div></div>
+    <section class="progress-card">
+      <div><div><p class="eyebrow">Tu progreso</p><strong>{{ completados }} <span>/ {{ ejercicios.length }} ejercicios</span></strong></div><span class="progress-number">{{ completados * 25 }}%</span></div>
+      <div class="progress-track"><span [style.width.%]="completados * 25"></span></div>
+    </section>
+    <div class="section-heading"><div><p class="eyebrow">Checklist</p><h2>Ejercicios de hoy</h2></div><button type="button" class="reset" (click)="reiniciar()">Reiniciar</button></div>
+    <div class="exercise-list">
+      <button class="exercise" *ngFor="let ejercicio of ejercicios" type="button" (click)="toggleEjercicio(ejercicio)" [class.done]="ejercicio.completado" [attr.aria-pressed]="ejercicio.completado">
+        <ion-icon [icon]="ejercicio.completado ? checkmarkCircle : ellipseOutline" aria-hidden="true"></ion-icon><span><strong>{{ ejercicio.nombre }}</strong><small>{{ ejercicio.detalle }}</small></span><span class="exercise-time">{{ ejercicio.completado ? 'LISTO' : 'PENDIENTE' }}</span>
+      </button>
+    </div>
+    <ion-button class="next-link" fill="clear" routerLink="/tabs/perfil">Revisa tu progreso de temporada <span aria-hidden="true">→</span></ion-button>
+  </main>
+</ion-content>
