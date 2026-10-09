@@ -1,19 +1,18 @@
 <?php
 
+use App\Models\BloqueoHorario;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Microservicio: Perfil del Jugador
  * Retorna los datos básicos del usuario y sus bloqueos de horario asociados.
  */
 Route::get('/perfil', function () {
-    $user = DB::table('users')->where('email', 'javier@email.com')->first();
-    
-    $bloqueos = DB::table('bloqueos_horarios')
-        ->where('user_id', $user->id)
-        ->select('id', 'dia_semana', 'hora_inicio', 'hora_fin')
-        ->get();
+    $user = User::where('email', 'javier@email.com')->first();
+
+    $bloqueos = BloqueoHorario::where('user_id', $user->id)
+        ->get(['id', 'dia_semana', 'hora_inicio', 'hora_fin']);
 
     return response()->json([
         "status" => "success",

@@ -1,30 +1,30 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
+use App\Models\Citacion;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Microservicio: Citaciones del Jugador
  * Retorna las invitaciones a partidos que están pendientes de respuesta ('pendiente').
  */
 Route::get('/citaciones', function () {
-    $user = DB::table('users')->where('email', 'javier@email.com')->first();
+    $user = User::where('email', 'javier@email.com')->first();
 
-    $citaciones = DB::table('citaciones')
-        ->join('partidos', 'citaciones.partido_id', '=', 'partidos.id')
-        ->where('citaciones.user_id', $user->id)
-        ->where('citaciones.estado_respuesta', 'pendiente')
-        ->select(
-            'citaciones.id as id_citacion', 
-            'partidos.id as id_partido', 
-            'partidos.fecha_hora_inicio as fecha_hora', 
-            'partidos.equipo_visitante as equipo_rival', 
-            'partidos.liga', 
-            'citaciones.mensaje_coach', 
-            'citaciones.estado_respuesta'
-        )
-        ->get();
+    $citaciones = Citacion::with('partido')
+        ->where('user_id', $user->id)
+        ->where('estado_respuesta', 'pendiente')
+        ->get()
+        ->map(fn ($c) => [
+            'id_citacion' => $c->id,
+            'id_partido' => $c->partido->id,
+            'fecha_hora' => $c->partido->fecha_hora_inicio,
+            'equipo_rival' => $c->partido->equipo_visitante,
+            'liga' => $c->partido->liga,
+            'mensaje_coach' => $c->mensaje_coach,
+            'estado_respuesta' => $c->estado_respuesta,
+        ]);
 
     return response()->json([
         "status" => "success",
@@ -38,19 +38,14 @@ Route::get('/citaciones', function () {
  */
 Route::patch('/citaciones/{id}/responder', function ($id, Request $request) {
     $estado = $request->input('estado');
-    
+
     // Validación de estado
     if (!in_array($estado, ['confirmado', 'rechazado'])) {
         return response()->json(['status' => 'error', 'message' => 'Estado inválido'], 400);
     }
 
     // Actualización de registro
-    DB::table('citaciones')
-        ->where('id', $id)
-        ->update([
-            'estado_respuesta' => $estado, 
-            'updated_at' => now()
-        ]);
+    Citacion::where('id', $id)->update(['estado_respuesta' => $estado]);
 
     return response()->json(['status' => 'success', 'message' => 'Citación actualizada exitosamente']);
 });

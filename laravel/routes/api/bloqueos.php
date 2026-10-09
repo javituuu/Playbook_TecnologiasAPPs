@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
+use App\Models\BloqueoHorario;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /**
  * Microservicio: Bloqueos de Horario (Mantenedor CRUD)
@@ -17,9 +18,9 @@ Route::post('/bloqueos', function (Request $request) {
         'hora_fin' => 'required'
     ]);
 
-    $user = DB::table('users')->where('email', 'javier@email.com')->first();
-    
-    $id = DB::table('bloqueos_horarios')->insertGetId([
+    $user = User::where('email', 'javier@email.com')->first();
+
+    $bloqueo = BloqueoHorario::create([
         'user_id' => $user->id,
         'dia_semana' => $request->input('dia_semana'),
         'hora_inicio' => $request->input('hora_inicio'),
@@ -27,19 +28,17 @@ Route::post('/bloqueos', function (Request $request) {
     ]);
 
     return response()->json([
-        'status' => 'success', 
-        'message' => 'Horario bloqueado exitosamente', 
-        'id' => $id
+        'status' => 'success',
+        'message' => 'Horario bloqueado exitosamente',
+        'id' => $bloqueo->id
     ]);
 });
 
 // ELIMINAR un bloqueo
 Route::delete('/bloqueos/{id}', function ($id) {
-    $deleted = DB::table('bloqueos_horarios')->where('id', $id)->delete();
-    
-    if ($deleted) {
+    if (BloqueoHorario::destroy($id)) {
         return response()->json(['status' => 'success', 'message' => 'Horario desbloqueado exitosamente']);
     }
-    
+
     return response()->json(['status' => 'error', 'message' => 'No se encontró el bloqueo'], 404);
 });

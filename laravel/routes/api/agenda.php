@@ -1,29 +1,29 @@
 <?php
 
+use App\Models\Citacion;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Microservicio: Agenda del Jugador
  * Retorna la lista de partidos en los cuales el jugador tiene una citación "confirmada".
  */
 Route::get('/agenda', function () {
-    $user = DB::table('users')->where('email', 'javier@email.com')->first();
-    
-    $agenda = DB::table('citaciones')
-        ->join('partidos', 'citaciones.partido_id', '=', 'partidos.id')
-        ->where('citaciones.user_id', $user->id)
-        ->where('citaciones.estado_respuesta', 'confirmado')
-        ->select(
-            'partidos.id as id_partido', 
-            'partidos.fecha_hora_inicio as fecha_hora', 
-            'partidos.liga', 
-            'partidos.equipo_local', 
-            'partidos.equipo_visitante', 
-            'partidos.lugar', 
-            'partidos.estado'
-        )
-        ->get();
+    $user = User::where('email', 'javier@email.com')->first();
+
+    $agenda = Citacion::with('partido')
+        ->where('user_id', $user->id)
+        ->where('estado_respuesta', 'confirmado')
+        ->get()
+        ->map(fn ($c) => [
+            'id_partido' => $c->partido->id,
+            'fecha_hora' => $c->partido->fecha_hora_inicio,
+            'liga' => $c->partido->liga,
+            'equipo_local' => $c->partido->equipo_local,
+            'equipo_visitante' => $c->partido->equipo_visitante,
+            'lugar' => $c->partido->lugar,
+            'estado' => $c->partido->estado,
+        ]);
 
     return response()->json([
         "status" => "success",
