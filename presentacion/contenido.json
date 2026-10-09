@@ -1,0 +1,410 @@
+{
+  "portada": {
+    "sobretitulo": "Tecnologías y Aplicaciones Web y Móviles",
+    "titulo": "Ligas universitarias de esports|PLAYBOOK",
+    "subtitulo": "Evaluación 1 · App del jugador en Ionic",
+    "pie": "Diego Muñoz  ·  Equipo Playbook  ·  2026",
+    "notas": "Buenas. Soy Diego, líder de Ionic, y les presento Playbook, un sistema para coordinar ligas universitarias de esports. Hoy muestro la primera entrega, la app del jugador. Voy a hablar de tres cosas: qué problema resolvemos y cómo sabremos que funcionó, cómo está armado el sistema y por qué lo armamos así, y qué requisito cubre cada pieza."
+  },
+  "problema": {
+    "titulo": "Horarios|A CIEGAS",
+    "subtitulo": "El problema que resolvemos",
+    "texto": "Cada liga agenda por su cuenta. Un alumno puede quedar citado en dos torneos a la misma hora.",
+    "bloques": [
+      {
+        "t": "Hoy",
+        "d": "WhatsApp, Discord y planillas que se desactualizan."
+      },
+      {
+        "t": "Consecuencia",
+        "d": "Partidos suspendidos y derrotas por no presentación."
+      }
+    ],
+    "leyenda": "Un mismo jugador, dos ligas",
+    "diagrama": {
+      "nodos": [
+        {
+          "id": "a",
+          "texto": "Diego, jugador"
+        },
+        {
+          "id": "b",
+          "texto": "20:00 · LoL vs UNAB",
+          "sub": "Liga Metropolitana Esports"
+        },
+        {
+          "id": "c",
+          "texto": "20:30 · Valorant vs INACAP",
+          "sub": "Torneo Interfacultades"
+        },
+        {
+          "id": "d",
+          "texto": "30 min de solapamiento"
+        }
+      ]
+    },
+    "notas": "Hoy cada liga arma su calendario sola, con grupos de WhatsApp, Discord y planillas. Les muestro un ejemplo armado por nosotros. Yo podría tener LoL a las 20:00 en una liga y Valorant a las 20:30 en otro torneo. Cada capitán me ve libre en su propio calendario, así que nadie nota el choque hasta que la fecha ya está fija. Ahí aparecen los partidos suspendidos o las derrotas por no presentación. Eso es lo que Playbook quiere evitar: cruzar los compromisos del mismo jugador antes de confirmar la fecha."
+  },
+  "quien": {
+    "titulo": "Para|QUIÉN",
+    "subtitulo": "Cuatro roles, tres aplicaciones",
+    "items": [
+      {
+        "titulo": "Jugador",
+        "texto": "Marca cuándo no puede jugar y responde sus citaciones. App Ionic, esta entrega."
+      },
+      {
+        "titulo": "Coach",
+        "texto": "Ve la disponibilidad del plantel y arma la nómina. App Flutter, Hito 2."
+      },
+      {
+        "titulo": "Admin de club y de liga",
+        "texto": "Inscriben planteles y arman el fixture con aviso de choques. Panel Laravel, Hito 3."
+      }
+    ],
+    "notas": "Son cuatro roles en tres aplicaciones. El jugador marca cuándo no puede jugar y responde sus citaciones: eso es lo que hice en Ionic. El coach ve la disponibilidad de su plantel y arma la nómina, y eso va en Flutter, en el Hito 2. Los administradores de club y de liga inscriben planteles y arman el fixture en el panel web de Laravel, en el Hito 3. Todavía no tenemos usuarios reales, así que esto parte del problema descrito en el acta y de lo que vivimos jugando."
+  },
+  "requisitos": {
+    "titulo": "Requisitos|ALTO NIVEL",
+    "subtitulo": "Nueve funcionales y tres no funcionales",
+    "grupos": [
+      {
+        "id": "RF.01",
+        "titulo": "Acceso",
+        "texto": "Inicio de sesión con los cuatro roles."
+      },
+      {
+        "id": "RF.02",
+        "titulo": "Bloqueos",
+        "texto": "El jugador bloquea los días y franjas en que no puede jugar."
+      },
+      {
+        "id": "RF.03",
+        "titulo": "Agenda",
+        "texto": "Una sola agenda con los partidos de todas sus ligas."
+      },
+      {
+        "id": "RF.04",
+        "titulo": "Citaciones",
+        "texto": "Confirmar o rechazar una citación a partido."
+      },
+      {
+        "id": "RF.05–06",
+        "titulo": "Plantel",
+        "texto": "Disponibilidad semanal del equipo y nómina con quórum."
+      },
+      {
+        "id": "RF.07",
+        "titulo": "Inscripción",
+        "texto": "Registrar clubes y jugadores e inscribirlos en torneos."
+      },
+      {
+        "id": "RF.08–09",
+        "titulo": "Fixture",
+        "texto": "Programar partidos y avisar si un jugador ya tiene otro a esa hora."
+      },
+      {
+        "id": "RNF.01–03",
+        "titulo": "Calidad",
+        "texto": "Android 10+ e iOS 15+, API bajo 1,5 s, interfaz según el rol."
+      }
+    ],
+    "notas": "Del acta saqué nueve requisitos funcionales y tres no funcionales, y los agrupé en siete grupos más calidad para poder seguirlos. Acceso, bloqueos, agenda y citaciones son del lado del jugador. Plantel es del coach. Inscripción y fixture son de los administradores. Aparte van los no funcionales: Android 10 o superior, iOS 15, una API que responda en menos de un segundo y medio, y una interfaz que cambie según el rol. Esos mismos grupos los cruzo con componentes al final."
+  },
+  "exito": {
+    "titulo": "Cómo se mide|EL ÉXITO",
+    "subtitulo": "Una métrica por cada problema",
+    "cabecera": [
+      "Problema",
+      "Métrica",
+      "Meta",
+      "Cuándo"
+    ],
+    "filas": [
+      [
+        "Choques",
+        "Choques detectados antes de publicar la fecha, sobre los sembrados en las pruebas",
+        "100%",
+        "Hito 3"
+      ],
+      [
+        "Quórum",
+        "Tiempo del coach para confirmar una nómina, frente a preguntar por chat",
+        "Menor; base por medir",
+        "Hito 2"
+      ],
+      [
+        "Planillas",
+        "Jugadores con la disponibilidad cargada cada semana",
+        "Por medir en piloto",
+        "Piloto"
+      ],
+      [
+        "Sin avisar",
+        "Derrotas por no presentación en cada torneo",
+        "Por medir en piloto",
+        "Piloto"
+      ],
+      [
+        "Bloqueo",
+        "Toques para bloquear una franja en la app",
+        "2 o menos",
+        "Ev1"
+      ],
+      [
+        "Calidad",
+        "Tareas principales sin errores; respuesta de la API",
+        "90% · bajo 1,5 s",
+        "Ev1"
+      ]
+    ],
+    "notas": "Para medir el éxito partí de los problemas y no de la tecnología. Choques: cuántos detecta el sistema antes de publicar una fecha. La meta es el 100% de los que sembramos en los casos de prueba, y eso es del Hito 3. Quórum: cuánto tarda el coach en confirmar una nómina comparado con preguntar por chat. Planillas desactualizadas y derrotas por no presentación no tienen línea base, así que las vamos a medir en un piloto. Para esta entrega las metas son el bloqueo rápido, dos toques o menos, y lo que pide el acta: 90% de tareas sin errores y API bajo 1,5 segundos. Todavía no las medimos, son metas."
+  },
+  "arquitectura": {
+    "titulo": "Arquitectura|CLIENTE Y API",
+    "subtitulo": "Lo construido hoy y lo que viene",
+    "nodos": [
+      {
+        "id": "a",
+        "texto": "HomePage",
+        "sub": "Ionic 9 · Angular 22"
+      },
+      {
+        "id": "b",
+        "texto": "JugadorService",
+        "sub": "HttpClient · Observables"
+      },
+      {
+        "id": "c",
+        "texto": "API REST",
+        "sub": "Laravel 13 · JSON"
+      },
+      {
+        "id": "d",
+        "texto": "Base de datos",
+        "sub": "SQLite hoy · MySQL 8"
+      },
+      {
+        "id": "e",
+        "texto": "App del coach",
+        "sub": "Flutter · Hito 2"
+      },
+      {
+        "id": "f",
+        "texto": "Panel web",
+        "sub": "Laravel · Hito 3"
+      }
+    ],
+    "etiquetas": [
+      "HTTP + JSON",
+      "Tablas",
+      "users · partidos · citaciones · bloqueos_horarios"
+    ],
+    "leyenda": "Línea continua: construido en Ev1.   Línea punteada: por construir.",
+    "notas": "Esta es la arquitectura. En la app Ionic hay un solo componente standalone, HomePage, con tres pestañas. No llama a la red directamente: pasa por JugadorService, que usa HttpClient y devuelve Observables. El servicio habla en JSON con la API de Laravel 13. Hoy son rutas simples, sin controladores y sin autenticación, y la API trabaja con un usuario fijo de prueba. La API lee y escribe en cuatro tablas: users, partidos, citaciones y bloqueos de horario, con claves foráneas que borran en cascada. La base es SQLite hoy y el destino que dice el acta es MySQL 8. Con línea punteada están la app del coach en Flutter y el panel web, que van a usar esta misma API en los hitos 2 y 3. Elegí que la pantalla no hable con la API directo para poder cambiar la URL o el formato en un solo archivo."
+  },
+  "ux": {
+    "titulo": "Una app|TRES PESTAÑAS",
+    "subtitulo": "Una acción principal por pantalla",
+    "bloques": [
+      {
+        "t": "Agenda",
+        "d": "Los partidos de sus ligas donde ya confirmó asistencia."
+      },
+      {
+        "t": "Citaciones",
+        "d": "Confirmar o rechazar una citación con un toque."
+      },
+      {
+        "t": "Perfil",
+        "d": "Datos del jugador y sus horarios bloqueados: crear y eliminar."
+      }
+    ],
+    "pie": "Cada pestaña muestra cargando, sin datos y error, y avisa al guardar o fallar.",
+    "pie_imagen": "Capturas de la app Ionic",
+    "notas": "Esta es la interfaz real de la app, en modo oscuro y en modo claro. Tiene una barra inferior con tres pestañas. Agenda muestra los partidos de las citaciones que el jugador ya confirmó. Citaciones permite confirmar o rechazar con un toque. Perfil muestra los datos del jugador y sus bloqueos, que se crean y se eliminan ahí mismo. En las tres pestañas manejé los estados de cargando, sin datos y error, y un aviso cuando se guarda algo o falla."
+  },
+  "identidad": {
+    "titulo": "Identidad|AQUA Y UVA",
+    "subtitulo": "Colores elegidos por su función",
+    "puntos": [
+      {
+        "t": "Dos tonos fríos que combinan",
+        "d": "Dusty Grape y Pearl Aqua son fríos y de baja saturación. Quedan bien juntos y no se pelean."
+      },
+      {
+        "t": "Contraste medido",
+        "d": "Blanco sobre Carbon Black da 15,9:1 y Aqua sobre Carbon Black 9,9:1, sobre el mínimo de WCAG."
+      },
+      {
+        "t": "Modo oscuro desde el acta",
+        "d": "El acta lo pide. Un fondo oscuro lo hace posible y deja al aqua como acento legible."
+      },
+      {
+        "t": "Marca propia",
+        "d": "No copia a Discord, Twitch ni Riot. El estado va con ícono y texto, no solo color."
+      }
+    ],
+    "notas": "La paleta se llama Aqua y uva. Elegí los colores por lo que hacen. Dusty Grape y Pearl Aqua son tonos fríos y apagados que calzan entre sí. Los contrastes están medidos con WCAG: el blanco sobre Carbon Black da 15,9 a 1 y el aqua sobre Carbon Black casi 10 a 1. El acta pide modo oscuro, y con este fondo el aqua se lee bien como acento. Además queríamos algo distinto a Discord, Twitch o Riot. Un principio fijo: ningún estado depende solo del color, siempre va con ícono y texto. Esta paleta es el diseño objetivo, la app todavía usa el tema por defecto de Ionic."
+  },
+  "porque": {
+    "titulo": "Por qué|ESTA ARQUITECTURA",
+    "subtitulo": "Cuatro decisiones y su razón",
+    "items": [
+      {
+        "titulo": "Una sola API",
+        "texto": "Ionic, Flutter y el panel usan los mismos endpoints. Las reglas de horario quedan en un lugar."
+      },
+      {
+        "titulo": "Base relacional",
+        "texto": "Cruzar horarios es unir jugador, citación y partido. Las claves foráneas evitan datos huérfanos."
+      },
+      {
+        "titulo": "Ionic y Capacitor",
+        "texto": "Un solo código Angular para Android e iOS, con datos por Observables."
+      },
+      {
+        "titulo": "SQLite primero",
+        "texto": "No necesita servidor para desarrollar. Las migraciones llevan el esquema a MySQL 8."
+      }
+    ],
+    "notas": "Elegí esto por cuatro razones. Primero, una sola API para tres clientes, así la lógica de horarios no se repite en cada app. Segundo, base relacional, porque detectar un choque es unir jugador, citación y partido, y las claves foráneas evitan datos huérfanos. Tercero, Ionic con Capacitor: un solo código en Angular para Android e iOS, que es lo que pide el requisito de plataformas. Y cuarto, SQLite mientras desarrollamos porque no necesita servidor. Las migraciones de Laravel permiten llevar el mismo esquema a MySQL 8 después."
+  },
+  "trazabilidad": {
+    "titulo": "Problema|Y SOLUCIÓN",
+    "subtitulo": "Cada requisito, su componente y estado",
+    "cabecera": [
+      "Requisito",
+      "Componente",
+      "Servicio / endpoint",
+      "Tabla",
+      "Estado"
+    ],
+    "filas": [
+      [
+        "RF.01 Acceso",
+        "Pantalla de login",
+        "Autenticación con token",
+        "users",
+        "Por hacer"
+      ],
+      [
+        "RF.02 Bloqueos",
+        "HomePage · Perfil",
+        "POST y DELETE /bloqueos",
+        "bloqueos_horarios",
+        "Hecho"
+      ],
+      [
+        "RF.03 Agenda",
+        "HomePage · Agenda",
+        "GET /agenda",
+        "partidos, citaciones",
+        "Hecho"
+      ],
+      [
+        "RF.04 Citaciones",
+        "HomePage · Citaciones",
+        "GET /citaciones y PATCH …/responder",
+        "citaciones",
+        "Hecho"
+      ],
+      [
+        "RF.05–06 Plantel",
+        "App del coach",
+        "Consulta de disponibilidad",
+        "bloqueos, citaciones",
+        "Hito 2"
+      ],
+      [
+        "RF.07 Inscripción",
+        "Panel web",
+        "Altas de clubes y jugadores",
+        "clubes (nueva)",
+        "Hito 3"
+      ],
+      [
+        "RF.08–09 Fixture",
+        "Panel web",
+        "Validación de choque al agendar",
+        "partidos, citaciones",
+        "Hito 3"
+      ]
+    ],
+    "notas": "Esta tabla cruza cada requisito con lo que lo cubre. Los tres del jugador están hechos en Ionic. Bloqueos usa POST y DELETE sobre bloqueos. Agenda usa GET sobre agenda, y devuelve los partidos con citación confirmada. Citaciones usa GET y un PATCH para responder. El login sigue pendiente, por eso la API usa un usuario fijo. Plantel va en la app de Flutter, Hito 2. Inscripción y fixture van en el panel web del Hito 3, y para inscribir hay que crear la tabla de clubes. El choque de horarios, que es el corazón del proyecto, se valida en ese último hito. Los no funcionales no están en la tabla, pero la API ya responde JSON y la medición de tiempos queda pendiente. Si miran la columna de estado, la lectura es simple: lo que depende solo del jugador está listo, y lo que depende del coach o del administrador viene en los próximos dos hitos. Cada requisito tiene un componente asignado y ninguno queda sin dueño. Lo pendiente lo dejé declarado como pendiente, sin maquillarlo. Cristóbal sigue con Flutter y Javier con el panel y la API, sobre las mismas tablas."
+  },
+  "cierre": {
+    "titulo": "Muchas|GRACIAS",
+    "subtitulo": "¿Preguntas?",
+    "pie": "Diego Muñoz  ·  Equipo Playbook",
+    "notas": "Resumo en una línea: el problema es el choque de horarios entre ligas, hoy resolvimos la parte del jugador, y la detección de choques llega en el Hito 3. Eso es todo de mi parte. Quedo atento a sus preguntas."
+  },
+  "anexo": {
+    "paleta": {
+      "titulo": "Paleta|AQUA Y UVA",
+      "subtitulo": "Cinco colores base y estados",
+      "notas": "Paleta completa con los valores hexadecimales. Los estados coral y ámbar se añadieron para modo oscuro, y rojo, ámbar y verde más oscuros para modo claro."
+    },
+    "tipografia": {
+      "titulo": "Dos|TIPOGRAFÍAS",
+      "subtitulo": "Una para títulos, otra para leer",
+      "filas": [
+        {
+          "rol": "Títulos",
+          "fuente": "League Spartan",
+          "uso": "Portadas, títulos de diapositiva y de pantalla"
+        },
+        {
+          "rol": "Cuerpo",
+          "fuente": "Inter",
+          "uso": "Textos, tablas y toda la app"
+        }
+      ],
+      "notas": "League Spartan solo para títulos. Inter para el resto, porque se lee bien en pantallas chicas."
+    },
+    "estados": {
+      "titulo": "Estados|SIN SOLO COLOR",
+      "subtitulo": "Cada estado lleva ícono y texto",
+      "filas": [
+        {
+          "estado": "Confirmado",
+          "color": "Aqua en oscuro, verde #0E705B en claro",
+          "señal": "Ícono de check y texto"
+        },
+        {
+          "estado": "Pendiente",
+          "color": "Ámbar #F2C879 en oscuro, #8A5A00 en claro",
+          "señal": "Ícono de reloj y texto"
+        },
+        {
+          "estado": "Rechazado",
+          "color": "Coral #F28B82 en oscuro, rojo #B3261E en claro",
+          "señal": "Ícono de cruz y texto"
+        },
+        {
+          "estado": "Error",
+          "color": "Coral #F28B82 en oscuro, rojo #B3261E en claro",
+          "señal": "Ícono de alerta y mensaje"
+        }
+      ],
+      "notas": "El color refuerza el estado, nunca lo reemplaza (WCAG 1.4.1). Es el diseño objetivo, aún no está aplicado en la app."
+    },
+    "usar": {
+      "titulo": "Cuándo|USAR CADA COLOR",
+      "subtitulo": "Reglas de contraste para la paleta",
+      "si": [
+        "Texto blanco o aqua sobre Carbon Black",
+        "Texto Cool Steel sobre Carbon Black (6,2:1)",
+        "Texto Dusty Grape sobre blanco (8,0:1)",
+        "Aqua y acero como relleno o detalle sobre blanco"
+      ],
+      "no": [
+        "Texto Dusty Grape sobre Carbon Black (2,0:1)",
+        "Texto aqua sobre blanco (1,6:1)",
+        "Texto Cool Steel sobre blanco (2,6:1)",
+        "Indicar un estado solo con color"
+      ],
+      "notas": "Los contrastes son WCAG 2.x. Los pares que no pasan sirven solo como relleno, nunca para texto."
+    }
+  }
+}

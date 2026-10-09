@@ -9,7 +9,7 @@ import {
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { calendarOutline, mailUnreadOutline, personOutline, trashOutline, addOutline } from 'ionicons/icons';
+import { calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline } from 'ionicons/icons';
 import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.service';
 
 @Component({
@@ -57,7 +57,7 @@ export class HomePage implements OnInit {
     private cdr: ChangeDetectorRef,
     private toastController: ToastController
   ) {
-    addIcons({ calendarOutline, mailUnreadOutline, personOutline, trashOutline, addOutline });
+    addIcons({ calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline });
   }
 
   ngOnInit() {
@@ -142,10 +142,11 @@ export class HomePage implements OnInit {
           this.cargarAgenda();
         }
         
+        this.mostrarMensaje(estado === 'confirmado' ? 'Citación aceptada' : 'Citación rechazada', 'success');
         this.cdr.detectChanges();
       },
       error: (err) => {
-        alert(err.message || 'Error al conectar con el servidor.');
+        this.mostrarMensaje(err.message || 'No se pudo responder la citación.', 'danger');
       }
     });
   }

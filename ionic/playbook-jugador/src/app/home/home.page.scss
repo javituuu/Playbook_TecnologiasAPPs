@@ -1,4 +1,82 @@
+// Espaciado en múltiplos de 4. Los colores vienen del tema (theme/variables.scss).
 .page-wrap {
   max-width: 480px;
   margin: 0 auto;
+  padding: 16px;
+}
+
+ion-card {
+  margin: 0 0 12px;
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+ion-list {
+  margin-bottom: 12px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--ion-card-background);
+}
+
+.hora {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// Cargando, error y vacío comparten una sola forma
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--ion-color-step-600);
+
+  ion-icon {
+    font-size: 32px;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin: 0;
+
+  dt {
+    color: var(--ion-color-step-600);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.seccion-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0 8px;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.formulario ion-item {
+  --background: transparent;
 }
