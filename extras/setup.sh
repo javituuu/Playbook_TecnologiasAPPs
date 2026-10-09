@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 sudo pacman -S --needed --noconfirm php php-sqlite composer
 printf 'extension=pdo_sqlite\nextension=sqlite3\n' | sudo tee /etc/php/conf.d/sqlite.ini >/dev/null
