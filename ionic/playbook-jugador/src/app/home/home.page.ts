@@ -10,7 +10,10 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline } from 'ionicons/icons';
-import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.service';
+import { PerfilService } from '../services/perfil.service';
+import { AgendaService, AgendaItem } from '../services/agenda.service';
+import { CitacionesService, CitacionItem } from '../services/citaciones.service';
+import { BloqueosService } from '../services/bloqueos.service';
 
 @Component({
   selector: 'app-home',
@@ -53,7 +56,10 @@ export class HomePage implements OnInit {
   };
 
   constructor(
-    private jugadorService: JugadorService,
+    private perfilService: PerfilService,
+    private agendaService: AgendaService,
+    private citacionesService: CitacionesService,
+    private bloqueosService: BloqueosService,
     private cdr: ChangeDetectorRef,
     private toastController: ToastController
   ) {
@@ -69,7 +75,7 @@ export class HomePage implements OnInit {
   cargarPerfil() {
     this.cargandoPerfil = true;
     this.errorPerfil = false;
-    this.jugadorService.getPerfil().subscribe({
+    this.perfilService.getPerfil().subscribe({
       next: (res) => {
         this.perfil = res.data;
         this.cargandoPerfil = false;
@@ -86,7 +92,7 @@ export class HomePage implements OnInit {
   cargarAgenda() {
     this.cargandoAgenda = true;
     this.errorAgenda = false;
-    this.jugadorService.getAgenda().subscribe({
+    this.agendaService.getAgenda().subscribe({
       next: (res) => {
         this.agenda = res.data;
         this.cargandoAgenda = false;
@@ -103,7 +109,7 @@ export class HomePage implements OnInit {
   cargarCitaciones() {
     this.cargandoCitaciones = true;
     this.errorCitaciones = false;
-    this.jugadorService.getCitaciones().subscribe({
+    this.citacionesService.getCitaciones().subscribe({
       next: (res) => {
         this.citaciones = res.data;
         this.cargandoCitaciones = false;
@@ -118,7 +124,7 @@ export class HomePage implements OnInit {
   }
 
   responderCitacion(idCitacion: number, estado: 'confirmado' | 'rechazado') {
-    this.jugadorService.responderCitacion(idCitacion, estado).subscribe({
+    this.citacionesService.responderCitacion(idCitacion, estado).subscribe({
       next: () => {
         // Ya no está pendiente, la sacamos de la lista sin volver a pedirla
         this.citaciones = this.citaciones.filter(c => c.id_citacion !== idCitacion);
@@ -164,7 +170,7 @@ export class HomePage implements OnInit {
     this.guardandoBloqueo = true;
     this.cdr.detectChanges();
 
-    this.jugadorService.crearBloqueo(this.nuevoBloqueo).subscribe({
+    this.bloqueosService.crearBloqueo(this.nuevoBloqueo).subscribe({
       next: (res) => {
         this.mostrarMensaje('Horario bloqueado exitosamente', 'success');
         this.mostrandoFormulario = false;
@@ -180,7 +186,7 @@ export class HomePage implements OnInit {
   }
 
   eliminarBloqueo(id: number) {
-    this.jugadorService.borrarBloqueo(id).subscribe({
+    this.bloqueosService.borrarBloqueo(id).subscribe({
       next: () => {
         this.mostrarMensaje('Bloqueo eliminado correctamente', 'success');
         this.cargarPerfil(); // Los bloqueos vienen dentro del perfil, por eso recargamos eso
