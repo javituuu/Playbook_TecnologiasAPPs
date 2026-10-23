@@ -2,14 +2,27 @@
 
 namespace Database\Seeders;
 
+<<<<<<< HEAD
 use App\Models\Partido;
 use App\Models\User;
+=======
+>>>>>>> rama-laravel
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * Siembra el entorno de demostración completo de Playbook.
+     *
+     * Cuentas (contraseña "password"):
+     *  - admin_liga: directiva.liga@playbook.cl
+     *  - admin_club: directiva.club@udd.cl
+     *  - coach:      coach.martinez@udd.cl (UDD Titans), coach.rojas@udd.cl (UDD Nova)
+     *  - jugador:    javier@email.com (usuario de la app Ionic), diego.perez@udd.cl, ...
+     */
     public function run(): void
     {
+<<<<<<< HEAD
         $user = User::factory()->create([
             'name' => 'Javier Benavides',
             'email' => 'javier@email.com',
@@ -37,5 +50,13 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $user->id, 'mensaje_coach' => $mensaje, 'estado_respuesta' => $estado,
             ]);
         }
+=======
+        $this->call([
+            DisciplinaSeeder::class,
+            UsuarioClubEquipoSeeder::class,
+            LigaFixtureSeeder::class,
+            BloqueoHorarioSeeder::class,
+        ]);
+>>>>>>> rama-laravel
     }
 }

@@ -1,9 +1,14 @@
 <?php
 
+<<<<<<< HEAD
+=======
+use App\Http\Resources\Jugador\AgendaPartidoResource;
+>>>>>>> rama-laravel
 use App\Models\Citacion;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
+<<<<<<< HEAD
 // Agenda = partidos donde ya confirmó su citación.
 Route::get('/agenda', function () {
     $user = User::where('email', 'javier@email.com')->first();
@@ -21,9 +26,27 @@ Route::get('/agenda', function () {
             'lugar' => $c->partido->lugar,
             'estado' => $c->partido->estado,
         ]);
+=======
+/**
+ * Microservicio: Agenda del Jugador
+ * Retorna la lista de partidos en los cuales el jugador tiene una citación "confirmada".
+ *
+ * Fase 2: Migrado de DB::table() a Eloquent + AgendaPartidoResource manteniendo el contrato JSON de Ionic.
+ */
+Route::get('/agenda', function () {
+    $user = User::where('email', 'javier@email.com')->firstOrFail();
+
+    $citacionesConfirmadas = Citacion::query()
+        ->where('user_id', $user->id)
+        ->confirmadas()
+        ->with(['partido.liga', 'partido.equipoLocal', 'partido.equipoVisitante'])
+        ->get()
+        ->sortBy(fn (Citacion $c) => $c->partido?->fecha_hora_inicio)
+        ->values();
+>>>>>>> rama-laravel
 
     return response()->json([
-        "status" => "success",
-        "data" => $agenda
+        'status' => 'success',
+        'data' => AgendaPartidoResource::collection($citacionesConfirmadas)->resolve(),
     ]);
 });
