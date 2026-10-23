@@ -25,7 +25,6 @@ Route::post('/bloqueos', function (StoreBloqueoHorarioRequest $request) {
     ]);
 });
 
-// ELIMINAR un bloqueo
 Route::delete('/bloqueos/{id}', function ($id) {
     $bloqueo = BloqueoHorario::find($id);
 

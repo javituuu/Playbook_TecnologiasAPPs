@@ -30,10 +30,8 @@ Route::get('/citaciones', function () {
     ]);
 });
 
-/**
- * Microservicio: Responder Citación
- * Permite cambiar el estado de una citación específica ('confirmado' o 'rechazado').
- */
+// Responde una citación con 'confirmado' o 'rechazado'.
+// Ojo: no revisa que siga pendiente ni que sea del jugador, actualiza cualquier id que le llegue.
 Route::patch('/citaciones/{id}/responder', function ($id, Request $request) {
     $estado = $request->input('estado');
 
