@@ -9,8 +9,11 @@ import {
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { calendarOutline, mailUnreadOutline, personOutline, trashOutline, addOutline } from 'ionicons/icons';
-import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.service';
+import { calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline } from 'ionicons/icons';
+import { PerfilService } from '../services/perfil.service';
+import { AgendaService, AgendaItem } from '../services/agenda.service';
+import { CitacionesService, CitacionItem } from '../services/citaciones.service';
+import { BloqueosService } from '../services/bloqueos.service';
 
 @Component({
   selector: 'app-home',
@@ -25,25 +28,25 @@ import { JugadorService, AgendaItem, CitacionItem } from '../services/jugador.se
   ],
 })
 export class HomePage implements OnInit {
-  /** Pestaña activa por defecto en el menú inferior */
+  /** Las pestañas no son rutas, esta variable decide qué bloque se ve. */
   pestanaActiva: string = 'agenda';
 
-  // --- Estados de Perfil ---
+  // Perfil: carga, error y datos
   perfil: any = null;
   cargandoPerfil: boolean = true;
   errorPerfil: boolean = false;
 
-  // --- Estados de Agenda ---
+  // Agenda: carga, error y datos
   agenda: AgendaItem[] = [];
   cargandoAgenda: boolean = true;
   errorAgenda: boolean = false;
 
-  // --- Estados de Citaciones ---
+  // Citaciones: carga, error y datos
   citaciones: CitacionItem[] = [];
   cargandoCitaciones: boolean = true;
   errorCitaciones: boolean = false;
 
-  // --- CRUD Horarios Bloqueados ---
+  // Formulario de bloqueos de horario
   mostrandoFormulario: boolean = false;
   guardandoBloqueo: boolean = false;
   nuevoBloqueo = {
@@ -53,11 +56,14 @@ export class HomePage implements OnInit {
   };
 
   constructor(
-    private jugadorService: JugadorService,
+    private perfilService: PerfilService,
+    private agendaService: AgendaService,
+    private citacionesService: CitacionesService,
+    private bloqueosService: BloqueosService,
     private cdr: ChangeDetectorRef,
     private toastController: ToastController
   ) {
-    addIcons({ calendarOutline, mailUnreadOutline, personOutline, trashOutline, addOutline });
+    addIcons({ calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline });
   }
 
   ngOnInit() {
@@ -66,13 +72,10 @@ export class HomePage implements OnInit {
     this.cargarCitaciones();
   }
 
-  /**
-   * Obtiene la información del perfil del jugador y sus horarios bloqueados a través del servicio.
-   */
   cargarPerfil() {
     this.cargandoPerfil = true;
     this.errorPerfil = false;
-    this.jugadorService.getPerfil().subscribe({
+    this.perfilService.getPerfil().subscribe({
       next: (res) => {
         this.perfil = res.data;
         this.cargandoPerfil = false;
@@ -86,13 +89,10 @@ export class HomePage implements OnInit {
     });
   }
 
-  /**
-   * Obtiene la lista de partidos confirmados a través del servicio.
-   */
   cargarAgenda() {
     this.cargandoAgenda = true;
     this.errorAgenda = false;
-    this.jugadorService.getAgenda().subscribe({
+    this.agendaService.getAgenda().subscribe({
       next: (res) => {
         this.agenda = res.data;
         this.cargandoAgenda = false;
@@ -106,13 +106,10 @@ export class HomePage implements OnInit {
     });
   }
 
-  /**
-   * Obtiene las invitaciones a partidos pendientes de respuesta a través del servicio.
-   */
   cargarCitaciones() {
     this.cargandoCitaciones = true;
     this.errorCitaciones = false;
-    this.jugadorService.getCitaciones().subscribe({
+    this.citacionesService.getCitaciones().subscribe({
       next: (res) => {
         this.citaciones = res.data;
         this.cargandoCitaciones = false;
@@ -126,42 +123,32 @@ export class HomePage implements OnInit {
     });
   }
 
-  /**
-   * Envía la respuesta (Aceptar/Rechazar) a través del servicio con validación.
-   * @param idCitacion ID de la citación a actualizar
-   * @param estado Estado de respuesta ('confirmado' o 'rechazado')
-   */
   responderCitacion(idCitacion: number, estado: 'confirmado' | 'rechazado') {
-    this.jugadorService.responderCitacion(idCitacion, estado).subscribe({
+    this.citacionesService.responderCitacion(idCitacion, estado).subscribe({
       next: () => {
-        // Remover visualmente la citación respondida de la lista de pendientes
+        // Ya no está pendiente, la sacamos de la lista sin volver a pedirla
         this.citaciones = this.citaciones.filter(c => c.id_citacion !== idCitacion);
         
-        // Si el jugador confirmó, recargar la agenda para reflejar el nuevo partido
+        // Al confirmar pasa a la agenda, así que la volvemos a pedir
         if (estado === 'confirmado') {
           this.cargarAgenda();
         }
         
+        this.mostrarMensaje(estado === 'confirmado' ? 'Citación aceptada' : 'Citación rechazada', 'success');
         this.cdr.detectChanges();
       },
       error: (err) => {
-        alert(err.message || 'Error al conectar con el servidor.');
+        this.mostrarMensaje(err.message || 'No se pudo responder la citación.', 'danger');
       }
     });
   }
 
-  /**
-   * Cambia la vista activa del dashboard.
-   * @param nombre Nombre de la pestaña seleccionada ('agenda', 'citaciones' o 'perfil')
-   */
   cambiarPestana(nombre: string) {
     this.pestanaActiva = nombre;
     this.cdr.detectChanges();
   }
 
-  // ==========================================
-  // MANTENEDOR CRUD: HORARIOS BLOQUEADOS
-  // ==========================================
+  // Mantenedor de horarios bloqueados
 
   mostrarFormulario() {
     this.mostrandoFormulario = true;
@@ -183,12 +170,12 @@ export class HomePage implements OnInit {
     this.guardandoBloqueo = true;
     this.cdr.detectChanges();
 
-    this.jugadorService.crearBloqueo(this.nuevoBloqueo).subscribe({
+    this.bloqueosService.crearBloqueo(this.nuevoBloqueo).subscribe({
       next: (res) => {
         this.mostrarMensaje('Horario bloqueado exitosamente', 'success');
         this.mostrandoFormulario = false;
         this.guardandoBloqueo = false;
-        this.cargarPerfil(); // Recargar la lista
+        this.cargarPerfil(); // Los bloqueos vienen dentro del perfil, por eso recargamos eso
       },
       error: (err) => {
         this.mostrarMensaje(err.message || 'Error al guardar el bloqueo.', 'danger');
@@ -199,10 +186,10 @@ export class HomePage implements OnInit {
   }
 
   eliminarBloqueo(id: number) {
-    this.jugadorService.borrarBloqueo(id).subscribe({
+    this.bloqueosService.borrarBloqueo(id).subscribe({
       next: () => {
         this.mostrarMensaje('Bloqueo eliminado correctamente', 'success');
-        this.cargarPerfil(); // Recargar la lista
+        this.cargarPerfil(); // Los bloqueos vienen dentro del perfil, por eso recargamos eso
       },
       error: (err) => {
         this.mostrarMensaje(err.message || 'Error al eliminar.', 'danger');

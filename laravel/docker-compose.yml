@@ -1,0 +1,31 @@
+# Base de datos MySQL 8.0 (InnoDB) para desarrollo local de Playbook.
+#
+#   docker compose up -d mysql
+#   php artisan migrate:fresh --seed
+#
+# Las credenciales coinciden con .env.example.
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: playbook-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: playbook_db
+      MYSQL_USER: playbook
+      MYSQL_PASSWORD: playbook_secret
+      MYSQL_ROOT_PASSWORD: root_secret
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - playbook-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot_secret"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  playbook-mysql-data:

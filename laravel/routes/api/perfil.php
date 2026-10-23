@@ -1,23 +1,22 @@
 <?php
 
+<<<<<<< HEAD
+use App\Models\BloqueoHorario;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
 
-/**
- * Microservicio: Perfil del Jugador
- * Retorna los datos básicos del usuario y sus bloqueos de horario asociados.
- */
+// Perfil del jugador + sus bloqueos de horario.
+// Por ahora no hay login, así que todas las rutas trabajan con Javier fijo.
 Route::get('/perfil', function () {
-    $user = DB::table('users')->where('email', 'javier@email.com')->first();
-    
-    $bloqueos = DB::table('bloqueos_horarios')
-        ->where('user_id', $user->id)
-        ->select('id', 'dia_semana', 'hora_inicio', 'hora_fin')
-        ->get();
+    $user = User::where('email', 'javier@email.com')->first();
+
+    $bloqueos = BloqueoHorario::where('user_id', $user->id)
+        ->get(['id', 'dia_semana', 'hora_inicio', 'hora_fin']);
 
     return response()->json([
         "status" => "success",
         "data" => [
+            // Club, disciplina, rol y rango van a mano por ahora, todavía no están en la BD.
             "id" => $user->id,
             "nombre_completo" => $user->name,
             "email" => $user->email,
@@ -28,5 +27,30 @@ Route::get('/perfil', function () {
             "estado" => "Activo en el plantel",
             "horarios_bloqueados" => $bloqueos
         ]
+=======
+use App\Http\Resources\Jugador\PerfilJugadorResource;
+use App\Models\User;
+use Illuminate\Support\Facades\Route;
+
+/**
+ * Microservicio: Perfil del Jugador
+ * Retorna los datos básicos del usuario y sus bloqueos de horario asociados.
+ *
+ * Fase 2: Migrado de DB::table() a Eloquent + PerfilJugadorResource manteniendo el contrato JSON de Ionic.
+ */
+Route::get('/perfil', function () {
+    $user = User::query()
+        ->where('email', 'javier@email.com')
+        ->with([
+            'membresiaPrincipal.equipo.club',
+            'membresiaPrincipal.equipo.disciplina',
+            'bloqueosHorarios',
+        ])
+        ->firstOrFail();
+
+    return response()->json([
+        'status' => 'success',
+        'data' => (new PerfilJugadorResource($user))->resolve(),
+>>>>>>> rama-laravel
     ]);
 });

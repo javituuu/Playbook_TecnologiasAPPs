@@ -1,2 +1,121 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// Tema Playbook "Aqua y uva". Modo claro por defecto; el oscuro sigue al sistema.
+// Colores de marca: Carbon #222222, Dusty Grape #4B4E6D, Pearl Aqua #84DCC6, Cool Steel #95A3B3.
+:root, :root.ios, :root.md {
+  --ion-font-family: 'Inter', system-ui, sans-serif;
+
+  --ion-background-color: #ffffff;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-text-color: #222222;
+  --ion-text-color-rgb: 34, 34, 34;
+  --ion-card-background: #eceef1;
+  --ion-item-background: #eceef1;
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-color: #222222;
+  --ion-tab-bar-background: #eceef1;
+  --ion-tab-bar-color: #4b4e6d;
+  --ion-tab-bar-color-selected: #4b4e6d;
+  --ion-border-color: #d5d9e0;
+  --ion-color-step-600: #4b4e6d;
+
+  --ion-color-primary: #4B4E6D;
+  --ion-color-primary-rgb: 75,78,109;
+  --ion-color-primary-contrast: #FFFFFF;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: #424560;
+  --ion-color-primary-tint: #5d607c;
+
+  --ion-color-secondary: #95A3B3;
+  --ion-color-secondary-rgb: 149,163,179;
+  --ion-color-secondary-contrast: #222222;
+  --ion-color-secondary-contrast-rgb: 34,34,34;
+  --ion-color-secondary-shade: #838f9e;
+  --ion-color-secondary-tint: #a0acbb;
+
+  --ion-color-success: #0E705B;
+  --ion-color-success-rgb: 14,112,91;
+  --ion-color-success-contrast: #FFFFFF;
+  --ion-color-success-contrast-rgb: 255,255,255;
+  --ion-color-success-shade: #0c6350;
+  --ion-color-success-tint: #267e6b;
+
+  --ion-color-warning: #8A5A00;
+  --ion-color-warning-rgb: 138,90,0;
+  --ion-color-warning-contrast: #FFFFFF;
+  --ion-color-warning-contrast-rgb: 255,255,255;
+  --ion-color-warning-shade: #794f00;
+  --ion-color-warning-tint: #966b1a;
+
+  --ion-color-danger: #B3261E;
+  --ion-color-danger-rgb: 179,38,30;
+  --ion-color-danger-contrast: #FFFFFF;
+  --ion-color-danger-contrast-rgb: 255,255,255;
+  --ion-color-danger-shade: #9e211a;
+  --ion-color-danger-tint: #bb3c35;
+
+  --ion-color-medium: #4B4E6D;
+  --ion-color-medium-rgb: 75,78,109;
+  --ion-color-medium-contrast: #FFFFFF;
+  --ion-color-medium-contrast-rgb: 255,255,255;
+  --ion-color-medium-shade: #424560;
+  --ion-color-medium-tint: #5d607c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root, :root.ios, :root.md {
+    --ion-background-color: #222222;
+    --ion-background-color-rgb: 34, 34, 34;
+    --ion-text-color: #ffffff;
+    --ion-text-color-rgb: 255, 255, 255;
+    --ion-card-background: #343644;
+    --ion-item-background: #343644;
+    --ion-toolbar-background: #222222;
+    --ion-toolbar-color: #ffffff;
+    --ion-tab-bar-background: #343644;
+    --ion-tab-bar-color: #95a3b3;
+    --ion-tab-bar-color-selected: #84dcc6;
+    --ion-border-color: #4b4e6d;
+    --ion-color-step-600: #95a3b3;
+
+  --ion-color-primary: #84DCC6;
+  --ion-color-primary-rgb: 132,220,198;
+  --ion-color-primary-contrast: #222222;
+  --ion-color-primary-contrast-rgb: 34,34,34;
+  --ion-color-primary-shade: #74c2ae;
+  --ion-color-primary-tint: #90e0cc;
+
+  --ion-color-secondary: #95A3B3;
+  --ion-color-secondary-rgb: 149,163,179;
+  --ion-color-secondary-contrast: #222222;
+  --ion-color-secondary-contrast-rgb: 34,34,34;
+  --ion-color-secondary-shade: #838f9e;
+  --ion-color-secondary-tint: #a0acbb;
+
+  --ion-color-success: #84DCC6;
+  --ion-color-success-rgb: 132,220,198;
+  --ion-color-success-contrast: #222222;
+  --ion-color-success-contrast-rgb: 34,34,34;
+  --ion-color-success-shade: #74c2ae;
+  --ion-color-success-tint: #90e0cc;
+
+  --ion-color-warning: #F2C879;
+  --ion-color-warning-rgb: 242,200,121;
+  --ion-color-warning-contrast: #222222;
+  --ion-color-warning-contrast-rgb: 34,34,34;
+  --ion-color-warning-shade: #d5b06a;
+  --ion-color-warning-tint: #f3ce86;
+
+  --ion-color-danger: #F28B82;
+  --ion-color-danger-rgb: 242,139,130;
+  --ion-color-danger-contrast: #222222;
+  --ion-color-danger-contrast-rgb: 34,34,34;
+  --ion-color-danger-shade: #d57a72;
+  --ion-color-danger-tint: #f3978f;
+
+  --ion-color-medium: #95A3B3;
+  --ion-color-medium-rgb: 149,163,179;
+  --ion-color-medium-contrast: #222222;
+  --ion-color-medium-contrast-rgb: 34,34,34;
+  --ion-color-medium-shade: #838f9e;
+  --ion-color-medium-tint: #a0acbb;
+  }
+}
