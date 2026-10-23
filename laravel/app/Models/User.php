@@ -8,13 +8,9 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-<<<<<<< HEAD
-use Illuminate\Database\Eloquent\Relations\HasMany;
-=======
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
->>>>>>> rama-laravel
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -41,16 +37,6 @@ class User extends Authenticatable
         ];
     }
 
-<<<<<<< HEAD
-    public function citaciones(): HasMany
-    {
-        return $this->hasMany(Citacion::class);
-    }
-
-    public function bloqueos(): HasMany
-    {
-        return $this->hasMany(BloqueoHorario::class);
-=======
     /**
      * Indica si el usuario posee alguno de los roles indicados.
      */
@@ -160,6 +146,5 @@ class User extends Authenticatable
     public function ligasOrganizadas(): HasMany
     {
         return $this->hasMany(Liga::class, 'organizador_user_id');
->>>>>>> rama-laravel
     }
 }

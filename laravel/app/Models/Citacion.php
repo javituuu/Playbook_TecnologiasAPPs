@@ -2,13 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-#[Fillable(['user_id', 'partido_id', 'mensaje_coach', 'estado_respuesta'])]
-=======
 use App\Enums\EstadoCitacionEnum;
 use App\Enums\RolMembresiaEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -28,21 +21,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'estado_respuesta',
     'respondido_en',
 ])]
->>>>>>> rama-laravel
 class Citacion extends Model
 {
     protected $table = 'citaciones';
 
-<<<<<<< HEAD
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function partido(): BelongsTo
-    {
-        return $this->belongsTo(Partido::class);
-=======
     /**
      * @return array<string, string>
      */
@@ -105,6 +87,5 @@ class Citacion extends Model
     public function scopeConfirmadas(Builder $query): Builder
     {
         return $query->where('estado_respuesta', EstadoCitacionEnum::CONFIRMADO);
->>>>>>> rama-laravel
     }
 }

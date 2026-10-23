@@ -2,13 +2,6 @@
 
 namespace App\Models;
 
-<<<<<<< HEAD
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-#[Fillable(['user_id', 'dia_semana', 'hora_inicio', 'hora_fin'])]
-=======
 use App\Enums\DiaSemanaEnum;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -30,16 +23,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'ubicacion',
     'es_recurrente',
 ])]
->>>>>>> rama-laravel
 class BloqueoHorario extends Model
 {
     protected $table = 'bloqueos_horarios';
 
-<<<<<<< HEAD
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-=======
     /**
      * @return array<string, string>
      */
@@ -124,6 +111,5 @@ class BloqueoHorario extends Model
         $s = str_pad($partes[2] ?? '00', 2, '0', STR_PAD_LEFT);
 
         return "{$h}:{$m}:{$s}";
->>>>>>> rama-laravel
     }
 }
