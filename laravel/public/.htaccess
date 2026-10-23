@@ -23,3 +23,11 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# CSS y fuentes del panel: el CSS va versionado con ?v=filemtime y las fuentes no cambian,
+# así que el navegador puede guardarlos un año sin volver a pedirlos.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|woff2)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
