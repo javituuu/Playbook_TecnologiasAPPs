@@ -1,0 +1,290 @@
+/*
+ * Panel Playbook. Mismo tema "Aqua y uva" que la app Ionic (ionic/playbook-jugador/src/theme/variables.scss):
+ * Carbon #222222, Dusty Grape #4B4E6D, Pearl Aqua #84DCC6, Cool Steel #95A3B3.
+ * Claro por defecto, oscuro según el sistema. Espaciado en múltiplos de 4.
+ */
+
+@font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url('../fonts/inter/inter-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 500; font-display: swap; src: url('../fonts/inter/inter-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 600; font-display: swap; src: url('../fonts/inter/inter-latin-600-normal.woff2') format('woff2'); }
+
+:root {
+  --fondo: #ffffff;
+  --superficie: #eceef1;
+  --borde: #d5d9e0;
+  --texto: #222222;
+  --tenue: #4b4e6d;
+  --primario: #4b4e6d;
+  --acento: #84dcc6;
+  --seleccion: #84dcc666;
+
+  --ok: #0e705b;
+  --aviso: #8a5a00;
+  --error: #b3261e;
+  --ok-fondo: #0e705b14;
+  --aviso-fondo: #8a5a0014;
+  --error-fondo: #b3261e12;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #222222;
+    --superficie: #343644;
+    --borde: #4b4e6d;
+    --texto: #ffffff;
+    --tenue: #95a3b3;
+    --primario: #84dcc6;
+    --seleccion: #84dcc64d;
+
+    --ok: #84dcc6;
+    --aviso: #f2c879;
+    --error: #f28b82;
+    --ok-fondo: #84dcc61f;
+    --aviso-fondo: #f2c8791f;
+    --error-fondo: #f28b821f;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 400 15px/1.5 'Inter', system-ui, sans-serif;
+  caret-color: var(--primario);
+  accent-color: var(--primario);
+}
+
+::selection { background: var(--seleccion); color: var(--texto); }
+
+a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+:focus-visible { outline: 2px solid var(--primario); outline-offset: 2px; border-radius: 4px; }
+
+h1, h2 { margin: 0; text-wrap: balance; }
+
+.saltar {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--primario);
+  color: var(--fondo);
+  font-weight: 600;
+}
+.saltar:focus { top: 12px; }
+
+.icono { display: inline-flex; width: 20px; height: 20px; flex: none; }
+.icono svg { width: 100%; height: 100%; fill: currentColor; }
+
+/* Estructura: lateral fijo en escritorio, barra superior en móvil */
+
+.marco { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+
+.lateral {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100vh;
+  padding: 24px 16px;
+  background: var(--superficie);
+}
+
+.marca {
+  padding: 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.nav { display: flex; flex-direction: column; gap: 4px; }
+
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  color: var(--tenue);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color .15s ease-out, color .15s ease-out;
+}
+.nav a:hover { color: var(--texto); background: color-mix(in srgb, var(--fondo) 55%, transparent); }
+.nav a[aria-current="page"] { background: var(--fondo); color: var(--primario); font-weight: 600; }
+
+.contenido { width: 100%; max-width: 1120px; padding: 40px 40px 64px; }
+
+/* Encabezados y bloques */
+
+.cabecera { margin-bottom: 32px; }
+.cabecera h1 { font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.02em; }
+.cabecera p { max-width: 68ch; margin: 8px 0 0; color: var(--tenue); }
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: -8px 0 8px;
+  color: var(--tenue);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+.volver .icono { width: 16px; height: 16px; }
+.volver:hover { color: var(--texto); }
+
+.bloque + .bloque, .aviso + .bloque { margin-top: 40px; }
+
+.bloque__titulo { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 12px; }
+.bloque__titulo h2 { font-size: 17px; font-weight: 600; }
+.bloque__titulo span { color: var(--tenue); font-size: 14px; }
+
+/* Tablas: mismo radio y borde que las listas de Ionic */
+
+.tabla { overflow-x: auto; border: 1px solid var(--borde); border-radius: 16px; }
+
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+
+th {
+  padding: 12px 16px;
+  background: var(--superficie);
+  color: var(--tenue);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+td { padding: 14px 16px; border-top: 1px solid var(--borde); vertical-align: middle; }
+
+
+td.fuerte { font-weight: 500; min-width: 220px; }
+
+/* Fila enlazada: el link del nombre se estira sobre toda la fila, así se puede hacer clic en cualquier parte */
+tr.enlazada { position: relative; cursor: pointer; transition: background-color .15s ease-out; }
+tr.enlazada:hover { background: color-mix(in srgb, var(--superficie) 45%, transparent); }
+tr.enlazada a { text-decoration: none; }
+tr.enlazada a::after { content: ''; position: absolute; inset: 0; }
+tr.enlazada a:focus-visible { outline: none; }
+tr.enlazada:has(a:focus-visible) { outline: 2px solid var(--primario); outline-offset: -2px; }
+tr.enlazada:hover a { text-decoration: underline; }
+td.num { white-space: nowrap; }
+.falta { color: var(--error); font-weight: 600; }
+
+/* Cada equipo de un partido lleva a su roster; el padding agranda el área de clic sin mover el texto */
+a.equipo { display: inline-block; margin: -6px -4px; padding: 6px 4px; border-radius: 6px; text-decoration: none; }
+a.equipo:hover { text-decoration: underline; }
+
+tr.pasado td { color: var(--tenue); }
+tr.pasado .estado { opacity: .7; }
+.tenue { color: var(--tenue); }
+.vs { margin: 0 4px; color: var(--tenue); font-weight: 400; }
+
+/* Estados: mismos colores semánticos que ion-color success / warning / danger */
+
+.estado {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.estado--ok { background: var(--ok-fondo); color: var(--ok); }
+.estado--aviso { background: var(--aviso-fondo); color: var(--aviso); }
+.estado--error { background: var(--error-fondo); color: var(--error); }
+.estado--neutro { background: var(--superficie); color: var(--tenue); }
+
+.aviso {
+  display: flex;
+  gap: 12px;
+  max-width: 820px;
+  padding: 16px;
+  border-radius: 16px;
+}
+.aviso p { margin: 0; }
+.aviso strong { font-weight: 600; }
+.aviso--error { background: var(--error-fondo); color: var(--error); }
+.aviso--ok { background: var(--ok-fondo); color: var(--ok); }
+.aviso .icono { margin-top: 1px; }
+
+/* Roster */
+
+.posiciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.posicion {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--superficie);
+}
+.posicion strong { font-weight: 600; }
+.posicion .tenue { font-size: 14px; }
+.posicion__rol { color: var(--primario); font-size: 13px; font-weight: 600; }
+
+.posicion--libre { background: none; border: 1px dashed var(--borde); }
+.posicion--libre strong { color: var(--tenue); font-weight: 500; }
+
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: var(--tenue);
+  text-align: center;
+}
+.vacio .icono { width: 32px; height: 32px; }
+.vacio p { max-width: 44ch; margin: 0; }
+
+@media (max-width: 760px) {
+  .marco { grid-template-columns: 1fr; }
+
+  .lateral {
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: auto;
+    padding: 12px 16px;
+  }
+  .marca { padding: 0; font-size: 18px; }
+  .nav { flex-direction: row; }
+  .nav a { padding: 8px 10px; }
+
+  .contenido { padding: 24px 16px 48px; }
+
+  /* En móvil cada fila pasa a ser una tarjeta con etiquetas, en vez de obligar a hacer scroll lateral */
+  .tabla { overflow: visible; border: 0; border-radius: 0; }
+  .tabla table, .tabla tbody, .tabla tr, .tabla td { display: block; }
+  .tabla thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .tabla tbody { display: grid; gap: 8px; }
+  .tabla tr { padding: 12px 16px; border: 1px solid var(--borde); border-radius: 16px; }
+  .tabla td { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; border: 0; text-align: right; }
+  .tabla td::before { content: attr(data-label); color: var(--tenue); font-size: 13px; text-align: left; }
+  .tabla td.fuerte { display: block; min-width: 0; padding-bottom: 8px; text-align: left; }
+  .cabecera h1 { font-size: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
