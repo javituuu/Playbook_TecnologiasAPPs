@@ -147,4 +147,43 @@ class User extends Authenticatable
     {
         return $this->hasMany(Liga::class, 'organizador_user_id');
     }
+
+    /**
+     * Permisos (abilities de Sanctum) asignados al emitir un token según el rol del usuario.
+     *
+     * @return list<string>
+     */
+    public function defaultTokenAbilities(): array
+    {
+        return match ($this->role) {
+            UserRoleEnum::JUGADOR => [
+                'role:jugador',
+                'perfil:read',
+                'agenda:read',
+                'citaciones:read',
+                'citaciones:respond',
+                'bloqueos:manage',
+            ],
+            UserRoleEnum::COACH => [
+                'role:coach',
+                'perfil:read',
+                'plantel:read',
+                'disponibilidad:read',
+                'nomina:manage',
+                'practicas:manage',
+            ],
+            UserRoleEnum::ADMIN_CLUB => [
+                'role:admin_club',
+                'club:manage',
+                'roster:manage',
+                'inscripciones:manage',
+            ],
+            UserRoleEnum::ADMIN_LIGA => [
+                'role:admin_liga',
+                'liga:manage',
+                'fixture:manage',
+            ],
+            default => ['role:jugador'],
+        };
+    }
 }

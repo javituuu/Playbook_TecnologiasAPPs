@@ -3,16 +3,16 @@
 use App\Http\Resources\Jugador\AgendaPartidoResource;
 use App\Models\Citacion;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /**
  * Microservicio: Agenda del Jugador
- * Retorna la lista de partidos en los cuales el jugador tiene una citación "confirmada".
- *
- * Fase 2: Migrado de DB::table() a Eloquent + AgendaPartidoResource manteniendo el contrato JSON de Ionic.
+ * Retorna la lista de partidos en los cuales el jugador autenticado tiene una citación "confirmada".
  */
-Route::get('/agenda', function () {
-    $user = User::where('email', 'javier@email.com')->firstOrFail();
+Route::get('/agenda', function (Request $request) {
+    /** @var User $user */
+    $user = $request->user();
 
     $citacionesConfirmadas = Citacion::query()
         ->where('user_id', $user->id)

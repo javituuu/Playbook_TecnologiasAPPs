@@ -2,23 +2,22 @@
 
 use App\Http\Resources\Jugador\PerfilJugadorResource;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /**
  * Microservicio: Perfil del Jugador
- * Retorna los datos básicos del usuario y sus bloqueos de horario asociados.
- *
- * Fase 2: Migrado de DB::table() a Eloquent + PerfilJugadorResource manteniendo el contrato JSON de Ionic.
+ * Retorna los datos básicos del usuario autenticado (vía Sanctum Bearer token) y sus bloqueos de horario.
  */
-Route::get('/perfil', function () {
-    $user = User::query()
-        ->where('email', 'javier@email.com')
-        ->with([
-            'membresiaPrincipal.equipo.club',
-            'membresiaPrincipal.equipo.disciplina',
-            'bloqueosHorarios',
-        ])
-        ->firstOrFail();
+Route::get('/perfil', function (Request $request) {
+    /** @var User $user */
+    $user = $request->user();
+
+    $user->load([
+        'membresiaPrincipal.equipo.club',
+        'membresiaPrincipal.equipo.disciplina',
+        'bloqueosHorarios',
+    ]);
 
     return response()->json([
         'status' => 'success',
