@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Route;
  * Endpoints de Autenticación y Verificación del API Gateway (Ionic & Flutter).
  */
 Route::prefix('auth')->group(function () {
-    // Público: Iniciar sesión y obtener Bearer token
-    Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
+    // Público con protección contra ataques de fuerza bruta (5 intentos/min)
+    Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:login')
+        ->name('api.auth.login');
 
     // Protegidos por Laravel Sanctum: requieren Header "Authorization: Bearer <token>"
     Route::middleware('auth:sanctum')->group(function () {
