@@ -23,6 +23,14 @@ readonly class ConflictoDetectadoDTO
     ) {}
 
     /**
+     * Indica si este conflicto es una violación dura que impide publicar el fixture o confirmar el partido.
+     */
+    public function bloqueaPublicacion(): bool
+    {
+        return $this->tipo->bloqueaPublicacion();
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(): array

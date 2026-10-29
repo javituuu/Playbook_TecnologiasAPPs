@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\EstadoPartidoEnum;
+use App\Enums\FormatoSerieEnum;
 use App\Enums\TipoPartidoEnum;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -19,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'equipo_local_id',
     'equipo_visitante_id',
     'tipo',
+    'formato_serie',
+    'minutos_por_partida',
     'jornada_numero',
     'bloque_etiqueta',
     'lugar',
@@ -37,6 +40,8 @@ class Partido extends Model
     {
         return [
             'tipo' => TipoPartidoEnum::class,
+            'formato_serie' => FormatoSerieEnum::class,
+            'minutos_por_partida' => 'integer',
             'jornada_numero' => 'integer',
             'fecha_hora_inicio' => 'datetime',
             'fecha_hora_fin' => 'datetime',
