@@ -2,6 +2,7 @@
 // Colores de marca: Carbon #222222, Dusty Grape #4B4E6D, Pearl Aqua #84DCC6, Cool Steel #95A3B3.
 :root, :root.ios, :root.md {
   --ion-font-family: 'Inter', system-ui, sans-serif;
+  --pb-font-display: 'League Spartan', 'Inter', system-ui, sans-serif;
 
   --ion-background-color: #ffffff;
   --ion-background-color-rgb: 255, 255, 255;
@@ -13,8 +14,9 @@
   --ion-toolbar-color: #222222;
   --ion-tab-bar-background: #eceef1;
   --ion-tab-bar-color: #4b4e6d;
-  --ion-tab-bar-color-selected: #4b4e6d;
+  --ion-tab-bar-color-selected: #222222;
   --ion-border-color: #d5d9e0;
+  --ion-color-step-550: #4b4e6d;
   --ion-color-step-600: #4b4e6d;
 
   --ion-color-primary: #4B4E6D;
@@ -74,6 +76,7 @@
     --ion-tab-bar-color: #95a3b3;
     --ion-tab-bar-color-selected: #84dcc6;
     --ion-border-color: #4b4e6d;
+    --ion-color-step-550: #95a3b3;
     --ion-color-step-600: #95a3b3;
 
   --ion-color-primary: #84DCC6;

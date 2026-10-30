@@ -1,0 +1,77 @@
+// Espaciado en múltiplos de 4. Los colores vienen del tema (theme/variables.scss).
+.page-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: max(12vh, 64px) 24px 24px;
+  position: relative;
+}
+
+// Marca P con la ranura rellena por la línea aqua; en oscuro la línea es el fondo (ranura vacía)
+.lockup { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+.marca-p { width: 48px; height: 48px; flex: none; position: relative; top: -5px; // alinea la P con la altura de mayúscula del wordmark
+   animation: subir 560ms var(--pb-out) both; }
+.marca-p .p { fill: var(--ion-color-primary); }
+.marca-p .linea {
+  fill: #84DCC6;
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: linea 480ms var(--pb-draw) 200ms both;
+}
+@media (prefers-color-scheme: dark) { .marca-p .linea { fill: var(--ion-background-color); } }
+.wordmark span { display: inline-block; animation: subir 560ms var(--pb-out) both; }
+.w-play { animation-delay: 80ms; }
+.w-book { font-weight: 300; animation-delay: 160ms; }
+h1 { animation: subir 480ms var(--pb-out) 280ms both; }
+.subtitulo { animation: subir 480ms var(--pb-out) 320ms both; }
+form { animation: subir 480ms var(--pb-out) 360ms both; }
+// Las animaciones esperan a que cargue la fuente
+.page-wrap:not(.listo) :is(.marca-p, .linea, .wordmark span, h1, .subtitulo, form) { animation-play-state: paused; }
+@keyframes linea { from { transform: scaleX(0); } }
+@keyframes subir { from { opacity: 0; transform: translateY(12px); } }
+
+.wordmark {
+  margin: 0;
+  font-family: var(--pb-font-display);
+  font-weight: 800;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ion-color-primary);
+}
+
+h1 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+.subtitulo {
+  margin: 0 0 16px;
+  color: var(--ion-color-step-600);
+}
+
+ion-list {
+  margin-bottom: 16px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--ion-card-background);
+}
+
+// Mismo bloque de estado que en Home
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  color: var(--ion-color-step-600);
+
+  ion-icon {
+    font-size: 32px;
+  }
+
+  p {
+    margin: 0;
+  }
+}

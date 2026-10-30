@@ -191,69 +191,24 @@ Ideal para ejecutar al abrir la app móvil (Splash Screen o Route Guard) y compr
 
 ---
 
-## 4. Guía de Integración para Ionic / Angular (Diego)
+## 4. Implementación en Ionic / Angular (Diego)
 
-En `ionic/playbook-jugador`, pueden agregar autenticación sin tocar la lógica de las vistas actuales siguiendo estos 2 pasos:
+Ya implementado en `ionic/playbook-jugador`:
 
-### Paso 1: Agregar métodos de Auth en `jugador.service.ts` (o `auth.service.ts`)
+* **Almacenamiento del token**: `@capacitor/preferences` con la clave `playbook_auth_token` (no se usa `localStorage`).
+* **`src/app/services/auth.service.ts`**:
+  * `AuthService`: `login()`, `verificar()` (`GET /auth/verify`), `logout()`, `cargarToken()`, `guardarToken()` y `limpiar()`.
+  * `authInterceptor`: agrega `Authorization: Bearer <token>` y `Accept: application/json`. Ante `401` (salvo en `/auth/login`) borra el token y redirige a `/login`. Ante `403` muestra un aviso.
+  * `authGuard`: protege `/home`. Sin token redirige a `/login`. Con token consulta `/auth/verify`: si responde `401` limpia la sesión y redirige; si falla por otra causa (por ejemplo, sin red) deja pasar y la pantalla Home muestra el reintento.
+* **Login**: página `src/app/login` (`LoginPage`), ruta `/login` en `src/app/app.routes.ts`. Al iniciar sesión correctamente navega a `/home`.
+* **Interceptor**: registrado en `src/main.ts` con `provideHttpClient(withInterceptors([authInterceptor]))`.
+* **URL base**: `environment.apiUrl` en `src/environments/environment.ts` (desarrollo) y `environment.prod.ts` (producción). Los servicios no tienen la URL escrita a mano.
 
-```typescript
-// En src/app/services/jugador.service.ts
-private readonly TOKEN_KEY = 'playbook_auth_token';
+Para correr los tests de autenticación y de Home:
 
-login(email: string, password: string): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/auth/login`, {
-    email,
-    password,
-    device_name: 'ionic-jugador-app',
-    rol_esperado: 'jugador'
-  }).pipe(
-    tap((res) => {
-      if (res?.data?.access_token) {
-        localStorage.setItem(this.TOKEN_KEY, res.data.access_token);
-      }
-    }),
-    catchError(this.handleError)
-  );
-}
-
-verificarSesion(): Observable<any> {
-  return this.http.get<any>(`${this.apiUrl}/auth/verify`).pipe(
-    catchError(this.handleError)
-  );
-}
-
-logout(): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/auth/logout`, {}).pipe(
-    tap(() => localStorage.removeItem(this.TOKEN_KEY)),
-    catchError(this.handleError)
-  );
-}
-```
-
-### Paso 2: Interceptor HTTP en `src/main.ts` para inyectar el Token automáticamente
-
-Con un `HttpInterceptorFn` funcional de Angular 18, todas las llamadas actuales (`getPerfil()`, `getAgenda()`, `getCitaciones()`, `crearBloqueo()`) enviarán el header `Authorization: Bearer <token>` automáticamente:
-
-```typescript
-// En src/main.ts
-import { provideHttpClient, withInterceptors, HttpInterceptorFn } from '@angular/common/http';
-
-const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('playbook_auth_token');
-  if (token) {
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-      },
-    });
-  }
-  return next(req);
-};
-
-// Dentro de bootstrapApplication(AppComponent, { providers: [ ... ] }):
-provideHttpClient(withInterceptors([authInterceptor]))
+```bash
+cd ionic/playbook-jugador
+npx ng test --watch=false
 ```
 
 ---

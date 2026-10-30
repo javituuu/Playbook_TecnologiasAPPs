@@ -73,10 +73,103 @@ ion-list {
   h2 {
     margin: 0;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 800;
   }
 }
 
 .formulario ion-item {
   --background: transparent;
 }
+
+.vs {
+  font-weight: 300;
+}
+
+.chip-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+
+  ion-icon {
+    font-size: 16px;
+  }
+}
+
+.chip-confirmado { color: var(--ion-color-success); }
+.chip-pendiente { color: var(--ion-color-warning); }
+.chip-conflicto { color: var(--ion-color-danger); }
+
+// Contorno de color + chip con texto: el conflicto no depende solo del color
+.en-conflicto { outline: 1px solid var(--ion-color-danger); outline-offset: -1px; }
+
+.estado .ayuda {
+  font-size: 14px;
+  max-width: 32ch;
+}
+
+.tactil {
+  width: 44px;
+  height: 44px;
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+// Entrada escalonada de tarjetas y filas
+.panel ion-card, .panel ion-list > ion-item {
+  animation: entrar 360ms var(--pb-out) both;
+  animation-delay: calc(min(var(--i, 0), 6) * 50ms);
+}
+@keyframes entrar { from { opacity: 0; transform: translateY(12px); } }
+
+// Próximo partido como marcador
+.marcador ion-card-title {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 26px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+
+  .equipo:last-child { text-align: end; }
+  .vs { color: var(--ion-color-primary); font-weight: 300; text-transform: none; }
+}
+.marcador .hora { font-weight: 600; }
+
+.chip-conflicto { animation: choque 280ms var(--pb-out) 200ms both; }
+@keyframes choque { 0% { transform: translateX(-3px); } 33% { transform: translateX(3px); } 66% { transform: translateX(-2px); } }
+
+// Indicador deslizante de pestaña
+// Ionic limita cada ion-tab-button a 168px y centra el grupo; sin esto los botones
+// no ocupan tercios y el indicador (calc(100%/3)) queda desalineado en pantallas anchas.
+ion-tab-button { max-width: none; }
+ion-footer { position: relative; }
+.tab-indicador {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: calc(100% / 3);
+  height: 4px;
+  pointer-events: none;
+  transform: translateX(calc(var(--tab, 0) * 100%));
+  transition: transform 320ms var(--pb-out);
+
+  &::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto;
+    border-radius: 0 0 2px 2px;
+    background: var(--ion-color-primary);
+  }
+}
+
+.logo-header { display: block; margin-inline-start: 16px; }

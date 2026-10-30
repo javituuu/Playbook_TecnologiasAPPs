@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface CitacionItem {
   id_citacion: number;
@@ -17,7 +18,7 @@ export interface CitacionItem {
   providedIn: 'root'
 })
 export class CitacionesService {
-  private readonly apiUrl = 'http://localhost:8000/api';
+  private readonly apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -42,7 +43,7 @@ export class CitacionesService {
     if (error.error instanceof ErrorEvent) {
       mensajeError = `Error del cliente: ${error.error.message}`;
     } else {
-      mensajeError = `Error ${error.status}: ${error.message || 'Fallo en la API'}`;
+      mensajeError = error.error?.message || `Error ${error.status}`;
     }
     console.error('CitacionesService Error:', mensajeError, error);
     return throwError(() => new Error(mensajeError));

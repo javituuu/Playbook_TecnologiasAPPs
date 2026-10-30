@@ -10,9 +10,12 @@
  */
 
 /* Tipografía Inter, empaquetada */
+@import "@fontsource/inter/latin-300.css";
 @import "@fontsource/inter/latin-400.css";
 @import "@fontsource/inter/latin-500.css";
 @import "@fontsource/inter/latin-600.css";
+@import "@fontsource/league-spartan/latin-800.css";
+@import "@fontsource/league-spartan/latin-300.css";
 
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
@@ -40,3 +43,43 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Títulos en League Spartan (solo hay pesos 300 y 800) */
+ion-title, h1, h2, ion-card-title {
+  font-family: var(--pb-font-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* Foco visible */
+.ion-focused, :focus-visible {
+  outline: 2px solid var(--ion-color-primary);
+  outline-offset: 2px;
+}
+ion-item.ion-focused { outline-offset: -2px; }
+
+ion-tab-button.tab-selected {
+  font-weight: 600;
+}
+
+// Curvas de movimiento compartidas
+:root {
+  --pb-out: cubic-bezier(.16, 1, .3, 1);
+  --pb-draw: cubic-bezier(.65, 0, .35, 1);
+}
+
+// Al responder una citación: la tarjeta vuela a la agenda o sale
+html[data-respuesta]::view-transition-old(root), html[data-respuesta]::view-transition-new(root) { animation: none; }
+html[data-respuesta]::view-transition-group(*) { animation-duration: 360ms; animation-timing-function: var(--pb-out); }
+html[data-respuesta="confirmado"]::view-transition-old(*):only-child { animation: pb-a-agenda 420ms var(--pb-draw) both; }
+html[data-respuesta="rechazado"]::view-transition-old(*):only-child { animation: pb-salir 200ms ease-in both; }
+@keyframes pb-a-agenda { to { transform: translate(-30%, 45%) scale(.55); opacity: 0; } }
+@keyframes pb-salir { to { transform: translateX(24px); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
