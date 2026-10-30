@@ -1,15 +1,18 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { NgFor, NgIf, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  IonHeader, IonToolbar, IonTitle, IonContent, IonImg, IonCard,
+  IonHeader, IonToolbar, IonTitle, IonContent, IonSkeletonText, IonCard,
   IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
   IonList, IonItem, IonLabel, IonButton, IonFooter, IonTabBar,
   IonTabButton, IonIcon, IonSpinner, IonInput, IonSelect, IonSelectOption,
   ToastController
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline } from 'ionicons/icons';
+import { calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline, logOutOutline, checkmarkCircleOutline, checkmarkOutline, closeOutline, closeCircleOutline, mailOpenOutline } from 'ionicons/icons';
+import { Router } from '@angular/router';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { AuthService } from '../services/auth.service';
 import { PerfilService } from '../services/perfil.service';
 import { AgendaService, AgendaItem } from '../services/agenda.service';
 import { CitacionesService, CitacionItem } from '../services/citaciones.service';
@@ -21,7 +24,7 @@ import { BloqueosService } from '../services/bloqueos.service';
   styleUrls: ['home.page.scss'],
   imports: [
     NgFor, NgIf, DatePipe, FormsModule,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonImg, IonCard,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonSkeletonText, IonCard,
     IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
     IonList, IonItem, IonLabel, IonButton, IonFooter, IonTabBar,
     IonTabButton, IonIcon, IonSpinner, IonInput, IonSelect, IonSelectOption
@@ -61,9 +64,27 @@ export class HomePage implements OnInit {
     private citacionesService: CitacionesService,
     private bloqueosService: BloqueosService,
     private cdr: ChangeDetectorRef,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private auth: AuthService,
+    private router: Router,
+    private host: ElementRef<HTMLElement>
   ) {
-    addIcons({ calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline });
+    addIcons({ calendarOutline, calendarClearOutline, mailOutline, mailUnreadOutline, personOutline, trashOutline, addOutline, alertCircleOutline, timeOutline, logOutOutline, checkmarkCircleOutline, checkmarkOutline, closeOutline, closeCircleOutline, mailOpenOutline });
+  }
+
+  get indicePestana() { return ['agenda', 'citaciones', 'perfil'].indexOf(this.pestanaActiva); }
+
+  private get sinMovimiento() {
+    return typeof matchMedia !== 'function' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  // Pequeño latido del icono de la agenda al llegar un partido nuevo
+  private pulsoAgenda() {
+    if (this.sinMovimiento) return;
+    this.host.nativeElement.querySelector('.tab-agenda ion-icon')?.animate?.(
+      [{ transform: 'scale(1)' }, { transform: 'scale(1.2)', offset: .4 }, { transform: 'scale(1)' }],
+      { duration: 480, easing: 'cubic-bezier(.16,1,.3,1)' }
+    );
   }
 
   ngOnInit() {
@@ -126,21 +147,44 @@ export class HomePage implements OnInit {
   responderCitacion(idCitacion: number, estado: 'confirmado' | 'rechazado') {
     this.citacionesService.responderCitacion(idCitacion, estado).subscribe({
       next: () => {
-        // Ya no está pendiente, la sacamos de la lista sin volver a pedirla
-        this.citaciones = this.citaciones.filter(c => c.id_citacion !== idCitacion);
-        
-        // Al confirmar pasa a la agenda, así que la volvemos a pedir
-        if (estado === 'confirmado') {
-          this.cargarAgenda();
+        const aplicar = () => {
+          // Ya no está pendiente, la sacamos de la lista sin volver a pedirla
+          this.citaciones = this.citaciones.filter(c => c.id_citacion !== idCitacion);
+
+          // Al confirmar pasa a la agenda, así que la volvemos a pedir
+          if (estado === 'confirmado') {
+            this.cargarAgenda();
+          }
+
+          this.mostrarMensaje(estado === 'confirmado' ? 'Citación aceptada' : 'Citación rechazada', 'success', estado === 'confirmado' ? undefined : 'close-circle-outline');
+          this.cdr.detectChanges();
+        };
+
+        if (estado === 'confirmado') Haptics.impact({ style: ImpactStyle.Light }).catch(() => {});
+        const fin = () => { if (estado === 'confirmado') this.pulsoAgenda(); };
+
+        // Sin View Transitions o con movimiento reducido: cambio directo
+        if (!('startViewTransition' in document) || this.sinMovimiento) {
+          aplicar();
+          fin();
+          return;
         }
-        
-        this.mostrarMensaje(estado === 'confirmado' ? 'Citación aceptada' : 'Citación rechazada', 'success');
-        this.cdr.detectChanges();
+        document.documentElement.dataset['respuesta'] = estado;
+        (document as any).startViewTransition(aplicar).finished.finally(() => {
+          delete document.documentElement.dataset['respuesta'];
+          fin();
+        });
       },
       error: (err) => {
         this.mostrarMensaje(err.message || 'No se pudo responder la citación.', 'danger');
       }
     });
+  }
+
+  cerrarSesion() {
+    // Con éxito o con error igual salimos: el token local ya se limpia en el servicio
+    const salir = () => this.router.navigateByUrl('/login', { replaceUrl: true });
+    this.auth.logout().subscribe({ next: salir, error: salir });
   }
 
   cambiarPestana(nombre: string) {
@@ -197,11 +241,12 @@ export class HomePage implements OnInit {
     });
   }
 
-  async mostrarMensaje(mensaje: string, color: string) {
+  async mostrarMensaje(mensaje: string, color: string, icono?: string) {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 2500,
       color: color,
+      icon: icono ?? ({ success: 'checkmark-circle-outline', danger: 'alert-circle-outline', warning: 'time-outline' } as Record<string, string>)[color],
       position: 'bottom'
     });
     toast.present();
