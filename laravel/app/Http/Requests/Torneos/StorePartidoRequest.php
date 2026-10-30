@@ -4,6 +4,7 @@ namespace App\Http\Requests\Torneos;
 
 use App\DTOs\Torneos\ProgramarPartidoDTO;
 use App\Enums\EstadoPartidoEnum;
+use App\Enums\FormatoSerieEnum;
 use App\Enums\TipoPartidoEnum;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
@@ -34,6 +35,8 @@ class StorePartidoRequest extends FormRequest
                 'different:equipo_local_id',
             ],
             'tipo' => ['nullable', 'string', Rule::in(TipoPartidoEnum::values())],
+            'formato_serie' => ['nullable', 'string', Rule::in(FormatoSerieEnum::values())],
+            'minutos_por_partida' => ['nullable', 'integer', 'min:15', 'max:120'],
             'fecha_hora_inicio' => ['required', 'date'],
             'fecha_hora_fin' => ['nullable', 'date', 'after:fecha_hora_inicio'],
             'duracion_minutos' => ['nullable', 'integer', 'min:30', 'max:360'],
@@ -45,10 +48,25 @@ class StorePartidoRequest extends FormRequest
 
     public function toDTO(): ProgramarPartidoDTO
     {
+        $formatoSerie = $this->filled('formato_serie')
+            ? FormatoSerieEnum::from((string) $this->input('formato_serie'))
+            : FormatoSerieEnum::BO1;
+
+        $minutosPorPartida = (int) $this->input(
+            'minutos_por_partida',
+            FormatoSerieEnum::MINUTOS_ESTANDAR_POR_PARTIDA
+        );
+
+        $duracionCalculada = $this->filled('duracion_minutos')
+            ? (int) $this->input('duracion_minutos')
+            : ($this->filled('formato_serie') || $this->filled('minutos_por_partida')
+                ? $formatoSerie->calcularDuracionMinutos($minutosPorPartida)
+                : 90);
+
         $inicio = CarbonImmutable::parse((string) $this->input('fecha_hora_inicio'));
         $fin = $this->filled('fecha_hora_fin')
             ? CarbonImmutable::parse((string) $this->input('fecha_hora_fin'))
-            : $inicio->addMinutes((int) $this->input('duracion_minutos', 90));
+            : $inicio->addMinutes($duracionCalculada);
 
         $tipo = $this->filled('tipo')
             ? TipoPartidoEnum::from((string) $this->input('tipo'))
@@ -65,6 +83,8 @@ class StorePartidoRequest extends FormRequest
             jornadaNumero: $this->filled('jornada_numero') ? (int) $this->input('jornada_numero') : null,
             bloqueEtiqueta: $this->input('bloque_etiqueta'),
             lugar: $this->input('lugar'),
+            formatoSerie: $formatoSerie,
+            minutosPorPartida: $minutosPorPartida,
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace App\DTOs\Torneos;
 
 use App\Enums\EstadoPartidoEnum;
+use App\Enums\FormatoSerieEnum;
 use App\Enums\TipoPartidoEnum;
 use Carbon\CarbonImmutable;
 
@@ -22,5 +23,15 @@ readonly class ProgramarPartidoDTO
         public ?int $jornadaNumero = null,
         public ?string $bloqueEtiqueta = null,
         public ?string $lugar = null,
+        public FormatoSerieEnum $formatoSerie = FormatoSerieEnum::BO1,
+        public int $minutosPorPartida = FormatoSerieEnum::MINUTOS_ESTANDAR_POR_PARTIDA,
     ) {}
+
+    /**
+     * Calcula la duración total en minutos de este partido/serie.
+     */
+    public function duracionTotalMinutos(): int
+    {
+        return (int) $this->fechaHoraInicio->diffInMinutes($this->fechaHoraFin);
+    }
 }
