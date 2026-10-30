@@ -1,0 +1,38 @@
+<ion-content>
+  <div class="page-wrap" [class.listo]="listo">
+    <div class="lockup" role="img" aria-label="Playbook">
+      <svg class="marca-p" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+        <path class="p" d="M8 6H27.5A12.5 12.5 0 0 1 27.5 31H18V42H8V21.5H33L37 15.5H8Z"/>
+        <path class="linea" d="M2 21.5H33L37 15.5H6Z"/>
+      </svg>
+      <p class="wordmark" aria-hidden="true"><span class="w-play">Play</span><span class="w-book">book</span></p>
+    </div>
+    <h1>Iniciar sesión</h1>
+    <p class="subtitulo">Ingresa con tu cuenta de jugador.</p>
+
+    <form (ngSubmit)="entrar()">
+      <ion-list lines="full">
+        <ion-item>
+          <ion-input label="Correo" labelPlacement="stacked" name="email" type="email" inputmode="email"
+            autocomplete="email" [(ngModel)]="email" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input label="Contraseña" labelPlacement="stacked" name="password" type="password"
+            autocomplete="current-password" [(ngModel)]="password" required></ion-input>
+        </ion-item>
+      </ion-list>
+
+      <div *ngIf="error" class="estado">
+        <ion-icon [name]="bloqueadoHasta > 0 ? 'time-outline' : 'alert-circle-outline'"
+          [color]="bloqueadoHasta > 0 ? 'warning' : 'danger'"></ion-icon>
+        <p role="alert">{{ error }}</p>
+      </div>
+
+      <ion-button type="submit" expand="block" [disabled]="cargando || bloqueadoHasta > 0">
+        <ion-spinner name="dots" *ngIf="cargando"></ion-spinner>
+        <span *ngIf="!cargando && bloqueadoHasta > 0">Reintentar en {{ bloqueadoHasta }} s</span>
+        <span *ngIf="!cargando && bloqueadoHasta <= 0">Entrar</span>
+      </ion-button>
+    </form>
+  </div>
+</ion-content>

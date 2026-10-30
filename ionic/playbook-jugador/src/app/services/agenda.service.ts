@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface AgendaItem {
   id_partido: number;
@@ -17,7 +18,7 @@ export interface AgendaItem {
   providedIn: 'root'
 })
 export class AgendaService {
-  private readonly apiUrl = 'http://localhost:8000/api';
+  private readonly apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -32,7 +33,7 @@ export class AgendaService {
     if (error.error instanceof ErrorEvent) {
       mensajeError = `Error del cliente: ${error.error.message}`;
     } else {
-      mensajeError = `Error ${error.status}: ${error.message || 'Fallo en la API'}`;
+      mensajeError = error.error?.message || `Error ${error.status}`;
     }
     console.error('AgendaService Error:', mensajeError, error);
     return throwError(() => new Error(mensajeError));
