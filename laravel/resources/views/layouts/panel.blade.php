@@ -23,9 +23,54 @@
                     <x-icono nombre="people-outline" /> Equipos
                 </a>
             </nav>
+
+            <div class="lateral__pie">
+                @auth
+                    <div class="usuario-sesion">
+                        <strong>{{ auth()->user()->name }}</strong>
+                        <span class="tenue">{{ auth()->user()->role?->label() }}</span>
+                        <span class="tenue usuario-sesion__email">{{ auth()->user()->email }}</span>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="boton boton--secundario boton--compacto boton--ancho">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                @else
+                    <div class="usuario-sesion">
+                        <strong>Modo Demo Abierto</strong>
+                        <span class="tenue">Vista sin restricción de rol</span>
+                    </div>
+                    <a href="{{ route('login') }}" class="boton boton--primario boton--compacto boton--ancho">
+                        Iniciar sesión
+                    </a>
+                @endauth
+            </div>
         </aside>
 
         <main id="contenido" class="contenido">
+            @if (session('ok'))
+                <div class="aviso aviso--ok aviso--flash" role="status">
+                    <x-icono nombre="checkmark-circle-outline" />
+                    <p><strong>{{ session('ok') }}</strong></p>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="aviso aviso--error aviso--flash" role="alert">
+                    <x-icono nombre="alert-circle-outline" />
+                    <p><strong>{{ session('error') }}</strong></p>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="aviso aviso--error aviso--flash" role="alert">
+                    <x-icono nombre="alert-circle-outline" />
+                    <p><strong>Revisa los datos enviados:</strong> {{ $errors->first() }}</p>
+                </div>
+            @endif
+
             @yield('contenido')
         </main>
     </div>
