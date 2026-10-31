@@ -1,67 +1,29 @@
 <?php
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Models\Equipo;
-use App\Models\EquipoJugador;
-use App\Models\Partido;
+use App\Http\Controllers\Panel\PanelAuthController;
+use App\Http\Controllers\Panel\PanelWebController;
 use Illuminate\Support\Facades\Route;
 
 /**
- * Panel web de solo lectura (Blade).
- * Muestra el fixture y los rosters directo desde la base de datos, sin pasar por la API.
+ * Panel Web Interactivo de Playbook (Admin de Liga, Admin de Club y Coach).
+ * Conecta las vistas Blade con autenticación de sesión y el Motor de Conflictos y Disponibilidad.
  */
 
-// Fixture: todos los partidos agrupados por liga; las prácticas quedan al final.
-Route::get('/', function () {
-    $partidos = Partido::query()
-        ->with(['liga.disciplina', 'equipoLocal', 'equipoVisitante'])
-        ->orderBy('fecha_hora_inicio')
-        ->get();
+// 0. Autenticación Web (Login / Logout)
+Route::get('/login', [PanelAuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [PanelAuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [PanelAuthController::class, 'logout'])->name('logout');
 
-    return view('panel.fixture', [
-        'grupos' => $partidos->groupBy(fn (Partido $p) => $p->nombreLigaOPractica())
-            ->sortBy(fn ($grupo) => $grupo->first()->liga === null),
-        'tentativos' => $partidos->where('estado', EstadoPartidoEnum::TENTATIVO)->count(),
-    ]);
-})->name('fixture');
+// 1. Fixture, Validación Automática de Liga y Programador de Partidos
+Route::get('/', [PanelWebController::class, 'fixture'])->name('fixture');
+Route::post('/ligas/{liga}/revalidar', [PanelWebController::class, 'revalidarLiga'])->name('ligas.revalidar');
+Route::post('/ligas/{liga}/publicar', [PanelWebController::class, 'publicarFixture'])->name('ligas.publicar');
+Route::post('/partidos', [PanelWebController::class, 'storePartido'])->name('partidos.store');
+Route::patch('/partidos/{partido}/reprogramar', [PanelWebController::class, 'reprogramarPartido'])->name('partidos.reprogramar');
 
-Route::get('/equipos', function () {
-    $equipos = Equipo::query()
-        ->with(['club', 'disciplina'])
-        ->withCount([
-            'membresias',
-            'membresias as titulares_count' => fn ($q) => $q
-                ->where('estado_invitacion', EstadoInvitacionEnum::ACEPTADA)
-                ->where('rol_membresia', RolMembresiaEnum::TITULAR),
-        ])
-        ->orderBy('nombre')
-        ->get();
-
-    // Una consulta por equipo; son pocos y así la regla de roster válido vive solo en el modelo.
-    return view('panel.equipos', [
-        'equipos' => $equipos,
-        'faltantes' => $equipos->mapWithKeys(fn (Equipo $e) => [$e->id => $e->posicionesSinTitular()])->all(),
-    ]);
-})->name('equipos');
-
-// Roster: un titular por posición de la disciplina; el resto del plantel va a la tabla.
-Route::get('/equipos/{equipo}', function (Equipo $equipo) {
-    $equipo->load(['club', 'disciplina', 'coach', 'membresias.jugador']);
-
-    $titulares = $equipo->membresias
-        ->filter(fn (EquipoJugador $m) => $m->estado_invitacion === EstadoInvitacionEnum::ACEPTADA
-            && $m->rol_membresia === RolMembresiaEnum::TITULAR
-            && $m->posicion_principal !== null)
-        ->unique(fn (EquipoJugador $m) => strtoupper($m->posicion_principal))
-        ->keyBy(fn (EquipoJugador $m) => strtoupper($m->posicion_principal));
-
-    return view('panel.roster', [
-        'equipo' => $equipo,
-        'posiciones' => $equipo->disciplina?->posiciones_validas ?? [],
-        'titulares' => $titulares,
-        'resto' => $equipo->membresias->diff($titulares->values()),
-        'faltantes' => $equipo->posicionesSinTitular(),
-    ]);
-})->name('equipos.show');
+// 2. Equipos, Gestión de Roster y Matriz Semanal de Disponibilidad
+Route::get('/equipos', [PanelWebController::class, 'equipos'])->name('equipos');
+Route::get('/equipos/{equipo}', [PanelWebController::class, 'showEquipo'])->name('equipos.show');
+Route::patch('/equipos/{equipo}/roster/{user}', [PanelWebController::class, 'updateRosterMember'])
+    ->whereNumber('user')
+    ->name('equipos.roster.update');
