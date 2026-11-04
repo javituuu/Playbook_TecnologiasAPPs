@@ -20,10 +20,17 @@ Route::post('/ligas/{liga}/revalidar', [PanelWebController::class, 'revalidarLig
 Route::post('/ligas/{liga}/publicar', [PanelWebController::class, 'publicarFixture'])->name('ligas.publicar');
 Route::post('/partidos', [PanelWebController::class, 'storePartido'])->name('partidos.store');
 Route::patch('/partidos/{partido}/reprogramar', [PanelWebController::class, 'reprogramarPartido'])->name('partidos.reprogramar');
+Route::delete('/partidos/{partido}', [PanelWebController::class, 'destroyPartido'])->name('partidos.destroy');
 
-// 2. Equipos, Gestión de Roster y Matriz Semanal de Disponibilidad
+// 2. Equipos, Creación, Inscripción en Ligas, Gestión de Roster y Matriz Semanal de Disponibilidad
 Route::get('/equipos', [PanelWebController::class, 'equipos'])->name('equipos');
+Route::post('/equipos', [PanelWebController::class, 'storeEquipo'])->name('equipos.store');
 Route::get('/equipos/{equipo}', [PanelWebController::class, 'showEquipo'])->name('equipos.show');
+Route::post('/equipos/{equipo}/inscripciones', [PanelWebController::class, 'inscribirEquipoEnLiga'])->name('equipos.inscripciones.store');
+Route::post('/equipos/{equipo}/roster', [PanelWebController::class, 'storeRosterMember'])->name('equipos.roster.store');
 Route::patch('/equipos/{equipo}/roster/{user}', [PanelWebController::class, 'updateRosterMember'])
     ->whereNumber('user')
     ->name('equipos.roster.update');
+Route::delete('/equipos/{equipo}/roster/{user}', [PanelWebController::class, 'destroyRosterMember'])
+    ->whereNumber('user')
+    ->name('equipos.roster.destroy');
