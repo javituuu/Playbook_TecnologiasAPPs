@@ -37,10 +37,10 @@ class PanelWebTest extends TestCase
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('Panel de Validación Automática')
-            ->assertSee('EQUILIBRIO DE LOCALÍA')
-            ->assertSee('DESCANSOS MÍNIMOS')
-            ->assertSee('PENALIZACIÓN TOTAL')
+            ->assertSee('Validación del fixture')
+            ->assertSee('Equilibrio local / visita')
+            ->assertSee('Descanso mínimo')
+            ->assertSee('Penalización')
             ->assertSee('CHOQUE_MULTI_LIGA')
             ->assertSee('DESCANSO_INSUFICIENTE');
     }
@@ -95,8 +95,8 @@ class PanelWebTest extends TestCase
             ->assertSee('Faltan titulares en MID y SUPPORT.')
             ->assertSee('Puede cubrir: Valentina Soto, Cata Ríos')
             ->assertSeeInOrder(['Titulares', 'Javier Benavides', 'Diego Pérez'])
-            ->assertSeeInOrder(['Suplentes, en prueba e invitaciones', 'Valentina Soto', 'Cata Ríos', 'Felipe Araya'])
-            ->assertSee('Matriz de Disponibilidad Semanal');
+            ->assertSeeInOrder(['Suplentes y jugadores a prueba', 'Valentina Soto', 'Cata Ríos', 'Felipe Araya'])
+            ->assertSee('Disponibilidad semanal del equipo');
     }
 
     public function test_actualizar_miembros_del_roster_completa_las_5_posiciones_titulares(): void
@@ -153,7 +153,7 @@ class PanelWebTest extends TestCase
     {
         $this->get('/login')
             ->assertOk()
-            ->assertSee('Iniciar Sesión · Panel Web')
+            ->assertSee('Iniciar sesión')
             ->assertSee('directiva.liga@playbook.cl')
             ->assertSee('directiva.club@udd.cl');
 
@@ -201,7 +201,7 @@ class PanelWebTest extends TestCase
             ->assertSee('UDD Titans')
             ->assertDontSee('UNAB Sharks');
 
-        // 2. Crear un nuevo equipo competitivo (RF.07)
+        // 2. Crear un nuevo equipo
         $this->post(route('equipos.store'), [
             'nombre' => 'UDD Valkyries',
             'club_id' => $clubUdd->id,
@@ -210,7 +210,7 @@ class PanelWebTest extends TestCase
 
         $nuevoEquipo = Equipo::where('nombre', 'UDD Valkyries')->firstOrFail();
 
-        // 3. Registrar e incorporar un nuevo jugador al roster (RF.07)
+        // 3. Registrar e incorporar un jugador al roster
         $this->post(route('equipos.roster.store', $nuevoEquipo), [
             'nuevo_nombre' => 'Lucas Ruiz',
             'nuevo_email' => 'lucas.ruiz@udd.cl',
@@ -229,7 +229,7 @@ class PanelWebTest extends TestCase
             'posicion_principal' => 'TOP',
         ]);
 
-        // 4. Inscribir el nuevo equipo en una liga de su misma disciplina (RF.07)
+        // 4. Inscribir el equipo en una liga de su disciplina
         $this->post(route('equipos.inscripciones.store', $nuevoEquipo), [
             'liga_id' => $ligaLol->id,
         ])->assertRedirect(route('equipos.show', $nuevoEquipo))
@@ -260,5 +260,77 @@ class PanelWebTest extends TestCase
             ->assertSessionHasErrors(['email']);
 
         $this->assertGuest();
+    }
+
+    public function test_vista_equipos_renderiza_estetica_consistente_con_ionic(): void
+    {
+        $response = $this->get('/equipos');
+        $response->assertOk()
+            ->assertDontSee('Liga Universitaria · Gestión de Escuadras')
+            ->assertSee('Equipos')
+            ->assertSee('search-outline')
+            ->assertSee('filter-outline')
+            ->assertSee('pildora-titulares')
+            ->assertSee('Registrar nuevo equipo')
+            ->assertDontSee('(RF.07)')
+            ->assertSee('Crear equipo');
+    }
+
+    public function test_vista_login_renderiza_estetica_consistente_con_ionic(): void
+    {
+        $response = $this->get('/login');
+        $response->assertOk()
+            ->assertSee('Iniciar sesión')
+            ->assertDontSee('· Panel Web')
+            ->assertSee('Credenciales')
+            ->assertDontSee('Acceso administrativo oficial')
+            ->assertSee('Cuentas de prueba para ingresar directo')
+            ->assertDontSee('(1 Clic)')
+            ->assertSee('tarjeta-cuenta')
+            ->assertSee('tarjeta-cuenta__avatar')
+            ->assertSee('log-in-outline')
+            ->assertSee('directiva.liga@playbook.cl');
+    }
+
+    public function test_vista_roster_renderiza_estetica_y_textos_humanizados(): void
+    {
+        $titans = Equipo::where('nombre', 'UDD Titans')->firstOrFail();
+
+        $response = $this->get("/equipos/{$titans->id}");
+        $response->assertOk()
+            ->assertSee('Volver a equipos')
+            ->assertDontSee('Roster Oficial ·')
+            ->assertDontSee('PASO 3: MATRIZ')
+            ->assertSee('Faltan titulares en MID y SUPPORT')
+            ->assertSee('Posición vacante')
+            ->assertSee('Asignar a')
+            ->assertSee('Bajar a suplente')
+            ->assertSee('Suplentes y jugadores a prueba')
+            ->assertSee('Agregar jugador al equipo')
+            ->assertDontSee('(RF.07)')
+            ->assertSee('Ligas inscritas')
+            ->assertSee('Disponibilidad semanal del equipo')
+            ->assertSee('tabla-heatmap')
+            ->assertSee('celda-heatmap-badge');
+    }
+
+    public function test_vista_fixture_renderiza_estetica_y_textos_humanizados(): void
+    {
+        $response = $this->get('/');
+        $response->assertOk()
+            ->assertSee('Fixture')
+            ->assertDontSee('Competición Oficial · Temporada 2026')
+            ->assertDontSee('VALIDACIÓN DE REGLAS')
+            ->assertDontSee('PASO 1: PANEL DE VALIDACIÓN')
+            ->assertDontSee('PASO 2: PROGRAMADOR')
+            ->assertSee('Validación del fixture')
+            ->assertSee('Equilibrio local / visita')
+            ->assertSee('Descanso mínimo')
+            ->assertSee('Penalización')
+            ->assertSee('Revalidar')
+            ->assertSee('Publicar fixture')
+            ->assertSee('Programar partido')
+            ->assertSee('Evaluar horarios')
+            ->assertSee('programador-partidos');
     }
 }

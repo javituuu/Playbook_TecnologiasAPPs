@@ -3,34 +3,43 @@
 @section('titulo', 'Equipos')
 
 @section('contenido')
-    <header class="cabecera">
+    <header class="cabecera cabecera--equipos">
         <h1>Equipos</h1>
         @if ($equipos->isNotEmpty())
             @php $incompletos = collect($faltantes)->filter()->count(); @endphp
             <p>
-                {{ trans_choice(':count equipo|:count equipos', $equipos->count()) }}
-                @if ($incompletos > 0) · {{ $incompletos }} con titulares pendientes @endif
+                {{ $equipos->count() }} {{ trans_choice('equipo registrado|equipos registrados', $equipos->count()) }} ·
+                @if ($incompletos > 0)
+                    {{ $incompletos }} {{ trans_choice('con titulares pendientes|con titulares pendientes', $incompletos) }}
+                @else
+                    todos con titulares completos
+                @endif
             </p>
+        @else
+            <p>0 equipos registrados</p>
         @endif
     </header>
 
-    {{-- Buscador y Filtros de Equipos por Club y Disciplina (Acta: Tablas con filtros y búsqueda) --}}
+    {{-- Buscador y filtros de equipos por club y disciplina --}}
     <section class="bloque" aria-label="Filtros y búsqueda de equipos">
         <form method="GET" action="{{ route('equipos') }}" class="rejilla-form">
             <div class="campo">
-                <label for="filtro-q">Buscar equipo o club</label>
-                <input
-                    id="filtro-q"
-                    type="search"
-                    name="q"
-                    value="{{ $filtroBuscar ?? '' }}"
-                    placeholder="Ej. Titans, UDD, Sharks..."
-                    class="control"
-                >
+                <label for="filtro-q">Buscar</label>
+                <div class="campo-con-icono">
+                    <x-icono nombre="search-outline" class="campo-con-icono__icono" />
+                    <input
+                        id="filtro-q"
+                        type="search"
+                        name="q"
+                        value="{{ $filtroBuscar ?? '' }}"
+                        placeholder="Buscar por nombre o club..."
+                        class="control control--con-icono"
+                    >
+                </div>
             </div>
 
             <div class="campo">
-                <label for="filtro-club">Club Universitario</label>
+                <label for="filtro-club">Club</label>
                 <select id="filtro-club" name="club_id" class="control">
                     <option value="">Todos los clubes</option>
                     @foreach ($clubes ?? [] as $club)
@@ -55,9 +64,15 @@
 
             <div class="campo campo--check">
                 <div class="barra-acciones">
-                    <button type="submit" class="boton boton--secundario">Filtrar</button>
+                    <button type="submit" class="boton boton--secundario">
+                        <x-icono nombre="filter-outline" />
+                        <span>Filtrar</span>
+                    </button>
                     @if (($filtroBuscar ?? '') !== '' || ($filtroClubId ?? null) !== null || ($filtroDisciplinaId ?? null) !== null)
-                        <a href="{{ route('equipos') }}" class="enlace-accion">Limpiar</a>
+                        <a href="{{ route('equipos') }}" class="enlace-accion enlace-accion--icono" title="Restablecer filtros">
+                            <x-icono nombre="refresh-outline" />
+                            <span>Limpiar</span>
+                        </a>
                     @endif
                 </div>
             </div>
@@ -86,22 +101,58 @@
                         @php
                             $requeridos = $equipo->disciplina?->titulares_requeridos ?? 5;
                             $falta = $faltantes[$equipo->id] ?? [];
+                            $completo = $falta === [] && $equipo->titulares_count >= $requeridos;
                         @endphp
                         <tr class="enlazada">
                             <td class="fuerte">
-                                <a href="{{ route('equipos.show', $equipo) }}">{{ $equipo->nombre }}</a>
-                                @unless ($equipo->activo)
-                                    <x-estado valor="inactivo" />
-                                @endunless
+                                <div class="equipo-nombre-celda">
+                                    <span class="avatar avatar--sm avatar-equipo" aria-hidden="true">
+                                        <x-icono nombre="shield-outline" />
+                                    </span>
+                                    <div class="equipo-nombre-info">
+                                        <a href="{{ route('equipos.show', $equipo) }}" class="equipo-enlace">{{ $equipo->nombre }}</a>
+                                        @unless ($equipo->activo)
+                                            <x-estado valor="inactivo" />
+                                        @endunless
+                                    </div>
+                                </div>
                             </td>
-                            <td class="tenue" data-label="Club">{{ $equipo->club?->siglas ?? '—' }}</td>
-                            <td data-label="Disciplina">{{ $equipo->disciplina?->nombre ?? '—' }}</td>
+                            <td data-label="Club">
+                                @if ($equipo->club?->siglas)
+                                    <span class="badge-club" title="{{ $equipo->club->nombre }}">{{ $equipo->club->siglas }}</span>
+                                @else
+                                    <span class="tenue">—</span>
+                                @endif
+                            </td>
+                            <td data-label="Disciplina">
+                                @if ($equipo->disciplina)
+                                    <span class="badge-disciplina">
+                                        <x-icono nombre="trophy-outline" class="icono-chico" />
+                                        <span>{{ $equipo->disciplina->nombre }}</span>
+                                    </span>
+                                @else
+                                    <span class="tenue">—</span>
+                                @endif
+                            </td>
                             <td data-label="Titulares">
-                                <span @class(['num', 'falta' => $falta !== []])>
-                                    {{ $equipo->titulares_count }}/{{ $requeridos }}@if ($falta !== []) · falta {{ \Illuminate\Support\Arr::join($falta, ', ', ' y ') }}@endif
+                                <span @class([
+                                    'pildora-titulares',
+                                    'font-grotesk',
+                                    'pildora-titulares--completo' => $completo,
+                                    'pildora-titulares--incompleto' => ! $completo,
+                                ])>
+                                    <span class="pildora-titulares__conteo">{{ $equipo->titulares_count }}/{{ $requeridos }}</span>
+                                    @if ($falta !== [])
+                                        <span class="pildora-titulares__detalle">· falta {{ \Illuminate\Support\Arr::join($falta, ', ', ' y ') }}</span>
+                                    @endif
                                 </span>
                             </td>
-                            <td class="num" data-label="Plantel">{{ $equipo->membresias_count }}</td>
+                            <td class="num font-grotesk" data-label="Plantel">
+                                <span class="plantel-conteo" title="{{ $equipo->membresias_count }} miembros en plantilla">
+                                    <x-icono nombre="people-outline" class="icono-chico" />
+                                    <span>{{ $equipo->membresias_count }}</span>
+                                </span>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -109,18 +160,18 @@
         </div>
     @endif
 
-    {{-- Formulario de Registro de Nuevo Equipo Competitivo (RF.07) --}}
+    {{-- Formulario de registro de nuevo equipo --}}
     <section id="registrar-equipo" class="bloque" aria-labelledby="titulo-nuevo-equipo">
         <div class="bloque__titulo">
-            <h2 id="titulo-nuevo-equipo">Registrar Nuevo Equipo (RF.07)</h2>
-            <span>Crea una nueva escuadra universitaria para un club y disciplina</span>
+            <h2 id="titulo-nuevo-equipo">Registrar nuevo equipo</h2>
+            <span>Crea un equipo para un club y disciplina específica</span>
         </div>
 
         <form method="POST" action="{{ route('equipos.store') }}" class="rejilla-form">
             @csrf
 
             <div class="campo">
-                <label for="nombre-equipo">Nombre del Equipo</label>
+                <label for="nombre-equipo">Nombre del equipo</label>
                 <input
                     id="nombre-equipo"
                     type="text"
@@ -132,7 +183,7 @@
             </div>
 
             <div class="campo">
-                <label for="nuevo-club-id">Club Universitario</label>
+                <label for="nuevo-club-id">Club</label>
                 <select id="nuevo-club-id" name="club_id" required class="control">
                     @foreach ($clubes ?? [] as $club)
                         <option value="{{ $club->id }}">{{ $club->nombreConSiglas() }}</option>
@@ -150,7 +201,7 @@
             </div>
 
             <div class="campo">
-                <label for="nuevo-coach-id">Coach Asignado (Opcional)</label>
+                <label for="nuevo-coach-id">Coach (opcional)</label>
                 <select id="nuevo-coach-id" name="coach_user_id" class="control">
                     <option value="">Sin coach asignado</option>
                     @foreach ($coaches ?? [] as $coach)
@@ -160,7 +211,10 @@
             </div>
 
             <div class="campo campo--check">
-                <button type="submit" class="boton boton--primario">+ Crear Equipo</button>
+                <button type="submit" class="boton boton--primario">
+                    <x-icono nombre="add-outline" />
+                    <span>Crear equipo</span>
+                </button>
             </div>
         </form>
     </section>
