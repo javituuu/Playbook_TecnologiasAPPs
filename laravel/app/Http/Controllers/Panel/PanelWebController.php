@@ -31,8 +31,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
- * Controlador del Panel Web de Playbook (Admin de Liga y Admin de Club).
- * Conecta las vistas Blade con el Motor de Conflictos y Disponibilidad (RF.06, RF.07, RF.08, RF.09).
+ * Controlador del panel web de Playbook (administración de ligas, clubes y equipos).
+ * Conecta las vistas Blade con el motor de disponibilidad y gestión de partidos.
  */
 class PanelWebController extends Controller
 {
@@ -42,9 +42,7 @@ class PanelWebController extends Controller
 
     /**
      * GET /
-     * Muestra el Fixture agrupado por liga junto con:
-     *  - El Panel de Validación Automática (KPIs, Violaciones Duras, Advertencias Blandas y botón Publicar).
-     *  - El Programador y Sugeridor de Ventanas Horarias entre dos equipos (Bo1, Bo3, Bo5).
+     * Muestra el fixture por liga con validación de reglas y el programador de horarios.
      */
     public function fixture(Request $request): View
     {
@@ -58,7 +56,7 @@ class PanelWebController extends Controller
             ->orderBy('id')
             ->get();
 
-        // Liga activa para el Panel de Validación Automática (por defecto: primera liga o la seleccionada por query)
+        // Liga activa para validar (por defecto la primera o la seleccionada en el filtro)
         $ligaSeleccionadaId = (int) $request->query('liga_id', $ligas->first()?->id ?? 0);
         $ligaActiva = $ligas->firstWhere('id', $ligaSeleccionadaId) ?? $ligas->first();
 
@@ -69,7 +67,7 @@ class PanelWebController extends Controller
 
         $reporteActivo = $ligaActiva ? ($reportesPorLiga[$ligaActiva->id] ?? null) : null;
 
-        // Parámetros del Sugeridor / Programador de Enfrentamientos
+        // Parámetros para buscar ventanas de horario entre dos equipos
         $equipos = Equipo::query()->with(['club', 'disciplina'])->orderBy('nombre')->get();
         $localId = (int) $request->query('local_id', $equipos->firstWhere('nombre', 'UDD Titans')?->id ?? $equipos->first()?->id ?? 0);
         $visitanteId = (int) $request->query('visitante_id', $equipos->firstWhere('nombre', 'PUC Paladins')?->id ?? $equipos->skip(1)->first()?->id ?? 0);
@@ -234,7 +232,7 @@ class PanelWebController extends Controller
             'estado' => $estadoInicial->value,
         ]);
 
-        // Emitir citaciones automáticas a titulares y jugadores en prueba aceptados de ambos equipos
+        // Notifica con citación a los titulares y jugadores a prueba de ambos equipos
         $this->citarPlantelActivo($partido);
 
         if ($tieneViolacionDura) {
@@ -353,8 +351,8 @@ class PanelWebController extends Controller
 
     /**
      * GET /equipos
-     * Listado general de equipos con filtros por búsqueda/club/disciplina, conteo de titulares
-     * y formulario para registrar nuevos equipos (RF.07).
+     * Listado general de equipos con filtros por búsqueda, club y disciplina,
+     * balance de titulares por posición y alta de nuevos equipos.
      */
     public function equipos(Request $request): View
     {
@@ -399,7 +397,7 @@ class PanelWebController extends Controller
 
     /**
      * POST /equipos
-     * Crea un nuevo equipo universitario dentro de un club y disciplina (RF.07).
+     * Registra un nuevo equipo dentro de un club y disciplina.
      */
     public function storeEquipo(Request $request): RedirectResponse
     {
@@ -425,8 +423,7 @@ class PanelWebController extends Controller
 
     /**
      * GET /equipos/{equipo}
-     * Muestra el Roster del equipo, formulario de gestión de posiciones/roles,
-     * inscripción en ligas y la Matriz Semanal de Disponibilidad del plantel (Titulares + Suplentes).
+     * Muestra el roster del equipo, gestión de jugadores y la matriz semanal de disponibilidad.
      */
     public function showEquipo(Request $request, Equipo $equipo): View
     {
@@ -452,7 +449,7 @@ class PanelWebController extends Controller
             horasBloques: ['15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'],
         );
 
-        // Jugadores existentes que aún no pertenecen a este equipo (para selector de invitación rápida)
+        // Jugadores disponibles que todavía no pertenecen a este equipo
         $miembrosUserIds = $equipo->membresias->pluck('user_id')->all();
         $jugadoresDisponiblesParaInvitar = User::query()
             ->where('role', UserRoleEnum::JUGADOR->value)
@@ -460,7 +457,7 @@ class PanelWebController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Ligas de la misma disciplina para inscribir al equipo
+        // Ligas de la misma disciplina donde el equipo todavía no está inscrito
         $ligasInscritasIds = $equipo->inscripcionesLiga->pluck('liga_id')->all();
         $ligasDisponibles = Liga::query()
             ->where('disciplina_id', $equipo->disciplina_id)
@@ -486,7 +483,7 @@ class PanelWebController extends Controller
 
     /**
      * POST /equipos/{equipo}/inscripciones
-     * Inscribe el equipo en una liga de su misma disciplina (RF.07).
+     * Inscribe el equipo en una liga de su misma disciplina deportiva.
      */
     public function inscribirEquipoEnLiga(Request $request, Equipo $equipo): RedirectResponse
     {
@@ -526,7 +523,7 @@ class PanelWebController extends Controller
 
     /**
      * POST /equipos/{equipo}/roster
-     * Invita o registra un jugador (existente o nuevo alumno) en el roster del equipo (RF.07).
+     * Invita o registra un jugador (existente o nuevo alumno) en el roster del equipo.
      */
     public function storeRosterMember(Request $request, Equipo $equipo): RedirectResponse
     {
