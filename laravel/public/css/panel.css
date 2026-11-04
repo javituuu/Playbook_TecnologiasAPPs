@@ -309,6 +309,19 @@ tr.pasado .estado { opacity: .7; }
 }
 .enlace-accion:hover { text-decoration: underline; }
 
+.boton-texto {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.boton-texto:hover { text-decoration: underline; }
+.boton-texto--peligro { color: var(--error); }
+
 .kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

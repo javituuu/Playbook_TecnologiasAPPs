@@ -188,17 +188,29 @@
                                 <td class="tenue" data-label="Lugar">{{ $partido->lugar ?? 'Por definir' }}</td>
                                 <td data-label="Estado"><x-estado :valor="$partido->estado" /></td>
                                 <td data-label="Acciones">
-                                    <a
-                                        class="enlace-accion"
-                                        href="{{ route('fixture', [
-                                            'liga_id' => $partido->liga_id ?? $ligaActiva?->id,
-                                            'reprogramar_id' => $partido->id,
-                                            'semana' => $partido->fecha_hora_inicio?->toDateString() ?? '2026-11-03',
-                                            'formato_serie' => $partido->formato_serie?->value ?? 'bo3',
-                                        ]) }}#programador-partidos"
-                                    >
-                                        Reprogramar
-                                    </a>
+                                    <div class="barra-acciones">
+                                        <a
+                                            class="enlace-accion"
+                                            href="{{ route('fixture', [
+                                                'liga_id' => $partido->liga_id ?? $ligaActiva?->id,
+                                                'reprogramar_id' => $partido->id,
+                                                'semana' => $partido->fecha_hora_inicio?->toDateString() ?? '2026-11-03',
+                                                'formato_serie' => $partido->formato_serie?->value ?? 'bo3',
+                                            ]) }}#programador-partidos"
+                                        >
+                                            Reprogramar
+                                        </a>
+
+                                        @if ($puedeGestionarLiga ?? true)
+                                            <form method="POST" action="{{ route('partidos.destroy', $partido) }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="boton-texto boton-texto--peligro">
+                                                    Eliminar
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

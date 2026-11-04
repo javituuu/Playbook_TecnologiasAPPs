@@ -13,8 +13,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Clubes\UpdateRosterMemberRequest;
 use App\Http\Requests\Torneos\StorePartidoRequest;
 use App\Models\Citacion;
+use App\Models\Club;
+use App\Models\Disciplina;
 use App\Models\Equipo;
 use App\Models\EquipoJugador;
+use App\Models\InscripcionLiga;
 use App\Models\Liga;
 use App\Models\Partido;
 use App\Models\User;
@@ -22,6 +25,9 @@ use App\Services\Disponibilidad\MotorConflictosService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
@@ -321,13 +327,51 @@ class PanelWebController extends Controller
     }
 
     /**
-     * GET /equipos
-     * Listado general de equipos con conteo de titulares y posiciones faltantes.
+     * DELETE /partidos/{partido}
+     * Elimina un partido o práctica del fixture (y sus citaciones asociadas en cascada).
      */
-    public function equipos(): View
+    public function destroyPartido(Request $request, Partido $partido): RedirectResponse
     {
+        if (! $this->puedeGestionarLiga($request->user())) {
+            return redirect()->route('fixture', ['liga_id' => $partido->liga_id])
+                ->with('error', 'Solo el Administrador de Liga o Coach puede eliminar un partido programado.');
+        }
+
+        $ligaId = $partido->liga_id;
+        $etiqueta = sprintf(
+            '%s vs %s',
+            $partido->equipoLocal?->nombre ?? 'Equipo',
+            $partido->equipoVisitante?->nombre ?? 'Práctica'
+        );
+
+        $partido->delete();
+
+        return redirect()
+            ->route('fixture', $ligaId ? ['liga_id' => $ligaId] : [])
+            ->with('ok', "Partido eliminado correctamente ({$etiqueta}).");
+    }
+
+    /**
+     * GET /equipos
+     * Listado general de equipos con filtros por búsqueda/club/disciplina, conteo de titulares
+     * y formulario para registrar nuevos equipos (RF.07).
+     */
+    public function equipos(Request $request): View
+    {
+        $buscar = trim((string) $request->query('q', ''));
+        $clubId = $request->filled('club_id') ? (int) $request->query('club_id') : null;
+        $disciplinaId = $request->filled('disciplina_id') ? (int) $request->query('disciplina_id') : null;
+
         $equipos = Equipo::query()
-            ->with(['club', 'disciplina'])
+            ->with(['club', 'disciplina', 'coach'])
+            ->when($buscar !== '', function ($q) use ($buscar) {
+                $q->where(function ($sub) use ($buscar) {
+                    $sub->where('nombre', 'like', "%{$buscar}%")
+                        ->orWhereHas('club', fn ($c) => $c->where('nombre', 'like', "%{$buscar}%")->orWhere('siglas', 'like', "%{$buscar}%"));
+                });
+            })
+            ->when($clubId !== null, fn ($q) => $q->where('club_id', $clubId))
+            ->when($disciplinaId !== null, fn ($q) => $q->where('disciplina_id', $disciplinaId))
             ->withCount([
                 'membresias',
                 'membresias as titulares_count' => fn ($q) => $q
@@ -337,20 +381,56 @@ class PanelWebController extends Controller
             ->orderBy('nombre')
             ->get();
 
+        $clubes = Club::orderBy('nombre')->get();
+        $disciplinas = Disciplina::orderBy('nombre')->get();
+        $coaches = User::where('role', UserRoleEnum::COACH->value)->orderBy('name')->get();
+
         return view('panel.equipos', [
             'equipos' => $equipos,
             'faltantes' => $equipos->mapWithKeys(fn (Equipo $e) => [$e->id => $e->posicionesSinTitular()])->all(),
+            'clubes' => $clubes,
+            'disciplinas' => $disciplinas,
+            'coaches' => $coaches,
+            'filtroBuscar' => $buscar,
+            'filtroClubId' => $clubId,
+            'filtroDisciplinaId' => $disciplinaId,
         ]);
     }
 
     /**
+     * POST /equipos
+     * Crea un nuevo equipo universitario dentro de un club y disciplina (RF.07).
+     */
+    public function storeEquipo(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nombre' => ['required', 'string', 'max:100'],
+            'club_id' => ['required', 'integer', 'exists:clubes,id'],
+            'disciplina_id' => ['required', 'integer', 'exists:disciplinas,id'],
+            'coach_user_id' => ['nullable', 'integer', 'exists:users,id'],
+        ]);
+
+        $equipo = Equipo::create([
+            'nombre' => $validated['nombre'],
+            'club_id' => (int) $validated['club_id'],
+            'disciplina_id' => (int) $validated['disciplina_id'],
+            'coach_user_id' => ! empty($validated['coach_user_id']) ? (int) $validated['coach_user_id'] : null,
+            'activo' => true,
+        ]);
+
+        return redirect()
+            ->route('equipos.show', $equipo)
+            ->with('ok', "Equipo '{$equipo->nombre}' registrado exitosamente. Ahora puedes agregar e invitar jugadores a su roster.");
+    }
+
+    /**
      * GET /equipos/{equipo}
-     * Muestra el Roster del equipo, formulario de gestión de posiciones/roles
-     * y la Matriz Semanal de Disponibilidad del plantel (Titulares + Suplentes).
+     * Muestra el Roster del equipo, formulario de gestión de posiciones/roles,
+     * inscripción en ligas y la Matriz Semanal de Disponibilidad del plantel (Titulares + Suplentes).
      */
     public function showEquipo(Request $request, Equipo $equipo): View
     {
-        $equipo->load(['club', 'disciplina', 'coach', 'membresias.jugador']);
+        $equipo->load(['club', 'disciplina', 'coach', 'membresias.jugador', 'inscripcionesLiga.liga']);
 
         $titulares = $equipo->membresias
             ->filter(fn (EquipoJugador $m) => $m->estado_invitacion === EstadoInvitacionEnum::ACEPTADA
@@ -372,6 +452,22 @@ class PanelWebController extends Controller
             horasBloques: ['15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'],
         );
 
+        // Jugadores existentes que aún no pertenecen a este equipo (para selector de invitación rápida)
+        $miembrosUserIds = $equipo->membresias->pluck('user_id')->all();
+        $jugadoresDisponiblesParaInvitar = User::query()
+            ->where('role', UserRoleEnum::JUGADOR->value)
+            ->whereNotIn('id', $miembrosUserIds)
+            ->orderBy('name')
+            ->get();
+
+        // Ligas de la misma disciplina para inscribir al equipo
+        $ligasInscritasIds = $equipo->inscripcionesLiga->pluck('liga_id')->all();
+        $ligasDisponibles = Liga::query()
+            ->where('disciplina_id', $equipo->disciplina_id)
+            ->whereNotIn('id', $ligasInscritasIds)
+            ->orderBy('nombre')
+            ->get();
+
         return view('panel.roster', [
             'equipo' => $equipo,
             'posiciones' => $equipo->disciplina?->posiciones_validas ?? [],
@@ -383,7 +479,145 @@ class PanelWebController extends Controller
             'formatoSeleccionado' => $formatoSerie,
             'minutosSeleccionados' => $minutosPorPartida,
             'puedeGestionarRoster' => $this->puedeGestionarRoster($request->user(), $equipo),
+            'jugadoresDisponiblesParaInvitar' => $jugadoresDisponiblesParaInvitar,
+            'ligasDisponibles' => $ligasDisponibles,
         ]);
+    }
+
+    /**
+     * POST /equipos/{equipo}/inscripciones
+     * Inscribe el equipo en una liga de su misma disciplina (RF.07).
+     */
+    public function inscribirEquipoEnLiga(Request $request, Equipo $equipo): RedirectResponse
+    {
+        if (! $this->puedeGestionarRoster($request->user(), $equipo) && ! $this->puedeGestionarLiga($request->user())) {
+            return redirect()->route('equipos.show', $equipo)
+                ->with('error', 'No tienes permisos para inscribir este equipo en una liga.');
+        }
+
+        $validated = $request->validate([
+            'liga_id' => ['required', 'integer', 'exists:ligas,id'],
+        ]);
+
+        $liga = Liga::findOrFail((int) $validated['liga_id']);
+
+        if ((int) $liga->disciplina_id !== (int) $equipo->disciplina_id) {
+            return redirect()->route('equipos.show', $equipo)
+                ->with('error', 'El equipo solo puede inscribirse en ligas de su misma disciplina.');
+        }
+
+        InscripcionLiga::updateOrCreate(
+            [
+                'liga_id' => $liga->id,
+                'equipo_id' => $equipo->id,
+            ],
+            [
+                'codigo_invitacion' => Str::upper(Str::random(12)),
+                'estado_invitacion' => EstadoInvitacionEnum::ACEPTADA->value,
+                'roster_validado' => $equipo->tieneRosterValido(),
+                'respondido_en' => now(),
+            ]
+        );
+
+        return redirect()
+            ->route('equipos.show', $equipo)
+            ->with('ok', "Equipo '{$equipo->nombre}' inscrito exitosamente en {$liga->nombre}.");
+    }
+
+    /**
+     * POST /equipos/{equipo}/roster
+     * Invita o registra un jugador (existente o nuevo alumno) en el roster del equipo (RF.07).
+     */
+    public function storeRosterMember(Request $request, Equipo $equipo): RedirectResponse
+    {
+        if (! $this->puedeGestionarRoster($request->user(), $equipo)) {
+            return redirect()->route('equipos.show', $equipo)
+                ->with('error', 'No tienes permisos para agregar jugadores a este equipo.');
+        }
+
+        $validated = $request->validate([
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'nuevo_nombre' => ['nullable', 'required_without:user_id', 'string', 'max:100'],
+            'nuevo_email' => ['nullable', 'required_without:user_id', 'email', 'max:150', 'unique:users,email'],
+            'posicion_principal' => ['required', 'string', 'max:30'],
+            'posicion_secundaria' => ['nullable', 'string', 'max:30'],
+            'rango_declarativo' => ['nullable', 'string', 'max:50'],
+            'rol_membresia' => ['required', 'string', Rule::in(RolMembresiaEnum::values())],
+            'estado_invitacion' => ['nullable', 'string', Rule::in(EstadoInvitacionEnum::values())],
+        ]);
+
+        if (! empty($validated['user_id'])) {
+            $jugador = User::findOrFail((int) $validated['user_id']);
+        } else {
+            $jugador = User::create([
+                'name' => (string) $validated['nuevo_nombre'],
+                'email' => (string) $validated['nuevo_email'],
+                'password' => Hash::make('password'),
+                'role' => UserRoleEnum::JUGADOR->value,
+                'activo' => true,
+            ]);
+        }
+
+        $rolMembresia = RolMembresiaEnum::from((string) $validated['rol_membresia']);
+        $estadoInvitacion = ! empty($validated['estado_invitacion'])
+            ? EstadoInvitacionEnum::from((string) $validated['estado_invitacion'])
+            : EstadoInvitacionEnum::ACEPTADA;
+
+        // Si entra directo como TITULAR ACEPTADO en una posición ocupada, bajamos al anterior a SUPLENTE
+        if ($rolMembresia === RolMembresiaEnum::TITULAR && $estadoInvitacion === EstadoInvitacionEnum::ACEPTADA) {
+            EquipoJugador::query()
+                ->where('equipo_id', $equipo->id)
+                ->where('user_id', '!=', $jugador->id)
+                ->where('rol_membresia', RolMembresiaEnum::TITULAR->value)
+                ->whereRaw('UPPER(posicion_principal) = ?', [strtoupper((string) $validated['posicion_principal'])])
+                ->update(['rol_membresia' => RolMembresiaEnum::SUPLENTE->value]);
+        }
+
+        $tieneMembresiaPrincipal = EquipoJugador::where('user_id', $jugador->id)->where('es_principal', true)->exists();
+
+        EquipoJugador::updateOrCreate(
+            [
+                'equipo_id' => $equipo->id,
+                'user_id' => $jugador->id,
+            ],
+            [
+                'posicion_principal' => strtoupper((string) $validated['posicion_principal']),
+                'posicion_secundaria' => ! empty($validated['posicion_secundaria']) ? strtoupper((string) $validated['posicion_secundaria']) : null,
+                'rango_declarativo' => $validated['rango_declarativo'] ?? 'Sin rango',
+                'rol_membresia' => $rolMembresia->value,
+                'estado_invitacion' => $estadoInvitacion->value,
+                'es_principal' => ! $tieneMembresiaPrincipal,
+            ]
+        );
+
+        return redirect()
+            ->route('equipos.show', $equipo)
+            ->with('ok', "Jugador {$jugador->name} incorporado al plantel de {$equipo->nombre}.");
+    }
+
+    /**
+     * DELETE /equipos/{equipo}/roster/{user}
+     * Retira a un jugador del roster del equipo.
+     */
+    public function destroyRosterMember(Request $request, Equipo $equipo, int $user): RedirectResponse
+    {
+        if (! $this->puedeGestionarRoster($request->user(), $equipo)) {
+            return redirect()->route('equipos.show', $equipo)
+                ->with('error', 'No tienes permisos para retirar jugadores de este equipo.');
+        }
+
+        $membresia = EquipoJugador::query()
+            ->where('equipo_id', $equipo->id)
+            ->where('user_id', $user)
+            ->with('jugador')
+            ->firstOrFail();
+
+        $nombreJugador = $membresia->jugador?->name ?? 'Jugador';
+        $membresia->delete();
+
+        return redirect()
+            ->route('equipos.show', $equipo)
+            ->with('ok', "Jugador {$nombreJugador} retirado del roster de {$equipo->nombre}.");
     }
 
     /**

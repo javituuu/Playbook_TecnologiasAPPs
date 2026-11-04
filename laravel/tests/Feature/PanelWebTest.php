@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Enums\EstadoInvitacionEnum;
 use App\Enums\EstadoPartidoEnum;
 use App\Enums\RolMembresiaEnum;
+use App\Models\Club;
+use App\Models\Disciplina;
 use App\Models\Equipo;
 use App\Models\Liga;
 use App\Models\Partido;
@@ -167,7 +169,14 @@ class PanelWebTest extends TestCase
             ->assertSee('Directiva Liga')
             ->assertSee('Administrador de Liga');
 
-        // 2. Cerrar sesión
+        // 2.5. Eliminar partido funciona correctamente
+        $partidoPractica = Partido::whereNull('liga_id')->firstOrFail();
+        $this->delete(route('partidos.destroy', $partidoPractica))
+            ->assertRedirect(route('fixture'))
+            ->assertSessionHas('ok');
+        $this->assertDatabaseMissing('partidos', ['id' => $partidoPractica->id]);
+
+        // 2.6. Cerrar sesión
         $this->post('/logout')->assertRedirect(route('login'));
         $this->assertGuest();
 
@@ -178,6 +187,68 @@ class PanelWebTest extends TestCase
         ])->assertRedirect(route('equipos'));
 
         $this->assertAuthenticated();
+    }
+
+    public function test_admin_club_puede_crear_equipo_invitar_jugador_inscribir_en_liga_y_filtrar(): void
+    {
+        $clubUdd = Club::where('siglas', 'UDD')->firstOrFail();
+        $lol = Disciplina::where('slug', 'lol')->firstOrFail();
+        $ligaLol = Liga::where('nombre', 'Liga Universitaria LoL 2026')->firstOrFail();
+
+        // 1. Filtrar equipos por búsqueda
+        $this->get(route('equipos', ['q' => 'Titans']))
+            ->assertOk()
+            ->assertSee('UDD Titans')
+            ->assertDontSee('UNAB Sharks');
+
+        // 2. Crear un nuevo equipo competitivo (RF.07)
+        $this->post(route('equipos.store'), [
+            'nombre' => 'UDD Valkyries',
+            'club_id' => $clubUdd->id,
+            'disciplina_id' => $lol->id,
+        ])->assertSessionHas('ok');
+
+        $nuevoEquipo = Equipo::where('nombre', 'UDD Valkyries')->firstOrFail();
+
+        // 3. Registrar e incorporar un nuevo jugador al roster (RF.07)
+        $this->post(route('equipos.roster.store', $nuevoEquipo), [
+            'nuevo_nombre' => 'Lucas Ruiz',
+            'nuevo_email' => 'lucas.ruiz@udd.cl',
+            'posicion_principal' => 'TOP',
+            'posicion_secundaria' => 'MID',
+            'rango_declarativo' => 'Diamante 1',
+            'rol_membresia' => RolMembresiaEnum::TITULAR->value,
+            'estado_invitacion' => EstadoInvitacionEnum::ACEPTADA->value,
+        ])->assertRedirect(route('equipos.show', $nuevoEquipo))
+            ->assertSessionHas('ok');
+
+        $lucas = User::where('email', 'lucas.ruiz@udd.cl')->firstOrFail();
+        $this->assertDatabaseHas('equipo_jugador', [
+            'equipo_id' => $nuevoEquipo->id,
+            'user_id' => $lucas->id,
+            'posicion_principal' => 'TOP',
+        ]);
+
+        // 4. Inscribir el nuevo equipo en una liga de su misma disciplina (RF.07)
+        $this->post(route('equipos.inscripciones.store', $nuevoEquipo), [
+            'liga_id' => $ligaLol->id,
+        ])->assertRedirect(route('equipos.show', $nuevoEquipo))
+            ->assertSessionHas('ok');
+
+        $this->assertDatabaseHas('inscripciones_liga', [
+            'equipo_id' => $nuevoEquipo->id,
+            'liga_id' => $ligaLol->id,
+        ]);
+
+        // 5. Retirar al jugador del equipo
+        $this->delete(route('equipos.roster.destroy', [$nuevoEquipo, $lucas->id]))
+            ->assertRedirect(route('equipos.show', $nuevoEquipo))
+            ->assertSessionHas('ok');
+
+        $this->assertDatabaseMissing('equipo_jugador', [
+            'equipo_id' => $nuevoEquipo->id,
+            'user_id' => $lucas->id,
+        ]);
     }
 
     public function test_login_web_rechaza_cuentas_de_jugador_movil(): void
