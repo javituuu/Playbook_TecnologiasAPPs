@@ -39,6 +39,12 @@ export class LoginPage implements OnInit, OnDestroy {
       .finally(() => { this.listo = true; this.cdr.detectChanges(); });
   }
 
+  entrarDemo(correo: string) {
+    this.email = correo;
+    this.password = 'password';
+    this.entrar();
+  }
+
   async entrar() {
     if (this.cargando || this.bloqueadoHasta > 0) return;
     this.cargando = true;

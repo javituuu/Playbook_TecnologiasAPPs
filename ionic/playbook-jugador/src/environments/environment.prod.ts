@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  // cambiar al desplegar
-  apiUrl: 'http://localhost:8000/api'
+  // En modo Feria / producción servida por Laravel (/jugador), apunta al mismo origen (/api)
+  apiUrl: '/api'
 };

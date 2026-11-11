@@ -333,4 +333,40 @@ class PanelWebTest extends TestCase
             ->assertSee('Evaluar horarios')
             ->assertSee('programador-partidos');
     }
+
+    public function test_reinicio_rapido_de_demo_restaura_estado_inicial_y_preserva_sesion(): void
+    {
+        // Iniciamos sesión como Admin de Liga
+        $this->post('/login', [
+            'email' => 'directiva.liga@playbook.cl',
+            'password' => 'password',
+        ])->assertRedirect(route('fixture'));
+
+        // Eliminamos un partido para alterar el estado de la demo
+        $totalInicial = Partido::count();
+        $partidoPractica = Partido::whereNull('liga_id')->firstOrFail();
+        $this->delete(route('partidos.destroy', $partidoPractica));
+        $this->assertSame($totalInicial - 1, Partido::count());
+
+        // Ejecutamos el botón de Reiniciar Demo
+        $this->post(route('demo.reset'))
+            ->assertRedirect(route('fixture'))
+            ->assertSessionHas('ok');
+
+        // Se restauraron todos los partidos y el usuario sigue autenticado
+        $this->assertSame($totalInicial, Partido::count());
+        $this->assertAuthenticated();
+        $this->assertSame('directiva.liga@playbook.cl', auth()->user()->email);
+    }
+
+    public function test_comando_artisan_demo_reset_funciona_correctamente(): void
+    {
+        Partido::query()->delete();
+        $this->assertSame(0, Partido::count());
+
+        $this->artisan('demo:reset')
+            ->assertExitCode(0);
+
+        $this->assertGreaterThan(0, Partido::count());
+    }
 }

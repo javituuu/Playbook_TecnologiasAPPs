@@ -34,3 +34,9 @@ Route::patch('/equipos/{equipo}/roster/{user}', [PanelWebController::class, 'upd
 Route::delete('/equipos/{equipo}/roster/{user}', [PanelWebController::class, 'destroyRosterMember'])
     ->whereNumber('user')
     ->name('equipos.roster.destroy');
+
+// 3. Modo Feria de Ciencias (Reinicio rápido de BD y Web App del Jugador integrada)
+Route::post('/demo/reset', [PanelWebController::class, 'resetDemo'])->name('demo.reset');
+Route::get('/jugador/{any?}', [PanelWebController::class, 'appJugador'])
+    ->where('any', '.*')
+    ->name('jugador.app');

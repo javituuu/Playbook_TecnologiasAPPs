@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'public_url' => env('PLAYBOOK_PUBLIC_URL'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

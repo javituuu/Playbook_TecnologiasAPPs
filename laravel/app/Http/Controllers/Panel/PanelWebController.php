@@ -21,10 +21,13 @@ use App\Models\InscripcionLiga;
 use App\Models\Liga;
 use App\Models\Partido;
 use App\Models\User;
+use App\Services\Demo\DemoResetService;
 use App\Services\Disponibilidad\MotorConflictosService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -38,6 +41,7 @@ class PanelWebController extends Controller
 {
     public function __construct(
         private readonly MotorConflictosService $motor,
+        private readonly DemoResetService $demoReset,
     ) {}
 
     /**
@@ -675,6 +679,50 @@ class PanelWebController extends Controller
                 ucfirst(str_replace('_', ' ', $dto->rolMembresia->value)),
                 $datosActualizar['posicion_principal'] ?? 'Sin posición'
             ));
+    }
+
+    /**
+     * POST /demo/reset
+     * Reinicia la base de datos al estado limpio de fábrica de la demo (Feria de Ciencias)
+     * preservando la cuenta con la que el usuario estaba autenticado.
+     */
+    public function resetDemo(Request $request): RedirectResponse
+    {
+        $emailAnterior = $request->user()?->email;
+
+        $ms = $this->demoReset->reset();
+
+        if ($emailAnterior) {
+            $nuevoUsuario = User::where('email', $emailAnterior)->first();
+            if ($nuevoUsuario) {
+                Auth::login($nuevoUsuario);
+            }
+        }
+
+        return redirect()
+            ->route('fixture')
+            ->with('ok', "Demo reiniciada al estado original ({$ms} ms). Lista para el siguiente visitante.");
+    }
+
+    /**
+     * GET /jugador/{any?}
+     * Sirve la Single Page Application (SPA) de Ionic compilada en public/jugador.
+     */
+    public function appJugador(): Response
+    {
+        $indexPath = public_path('jugador/index.html');
+
+        if (! file_exists($indexPath)) {
+            return response(
+                'La versión web del jugador aún no está compilada. Ejecuta ./feria.sh o compila Ionic en public/jugador.',
+                503
+            );
+        }
+
+        return response(file_get_contents($indexPath), 200, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        ]);
     }
 
     /**

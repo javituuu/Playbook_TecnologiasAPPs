@@ -33,6 +33,16 @@
         <span *ngIf="!cargando && bloqueadoHasta > 0">Reintentar en {{ bloqueadoHasta }} s</span>
         <span *ngIf="!cargando && bloqueadoHasta <= 0">Entrar</span>
       </ion-button>
+
+      <div class="demo-acceso">
+        <p class="demo-etiqueta">Acceso rápido · Modo Feria</p>
+        <ion-button type="button" fill="outline" expand="block" [disabled]="cargando || bloqueadoHasta > 0" (click)="entrarDemo('javier@email.com')">
+          Entrar como Javier Benavides (UDD Titans)
+        </ion-button>
+        <ion-button type="button" fill="clear" size="small" expand="block" [disabled]="cargando || bloqueadoHasta > 0" (click)="entrarDemo('diego.perez@udd.cl')">
+          Entrar como Diego Pérez (Multi-liga LoL + Valorant)
+        </ion-button>
+      </div>
     </form>
   </div>
 </ion-content>

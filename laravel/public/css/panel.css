@@ -2448,3 +2448,82 @@ input[type="radio"] {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   19. MODO FERIA DE CIENCIAS · CONTROLES LATERALES Y MODAL QR
+   ========================================================================== */
+
+.lateral__feria {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--borde);
+}
+
+.lateral__feria form {
+  margin: 0;
+}
+
+.modal-qr {
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  background: var(--superficie-elevada);
+  color: var(--texto);
+  max-width: 440px;
+  width: calc(100% - 32px);
+}
+
+.modal-qr::backdrop {
+  background: rgba(18, 19, 26, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+.modal-qr__tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.modal-qr__cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal-qr__cabecera h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-qr__subtexto {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.modal-qr__lienzo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.modal-qr__lienzo img {
+  display: block;
+  width: 220px;
+  height: 220px;
+  border-radius: 8px;
+}
+
+.modal-qr__acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
