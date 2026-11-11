@@ -713,6 +713,10 @@ class PanelWebController extends Controller
         $indexPath = public_path('jugador/index.html');
 
         if (! file_exists($indexPath)) {
+            $indexPath = public_path('jugador/browser/index.html');
+        }
+
+        if (! file_exists($indexPath)) {
             return response(
                 'La versión web del jugador aún no está compilada. Ejecuta ./feria.sh o compila Ionic en public/jugador.',
                 503

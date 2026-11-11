@@ -24,6 +24,18 @@ else
         npm install
     fi
     ./node_modules/.bin/ng build --configuration production --base-href /jugador/ --output-path "$LARAVEL_DIR/public/jugador"
+
+    # En versiones modernas de Angular, los archivos se generan dentro de un subdirectorio "browser/"
+    if [ -d "$LARAVEL_DIR/public/jugador/browser" ]; then
+        cp -r "$LARAVEL_DIR/public/jugador/browser/"* "$LARAVEL_DIR/public/jugador/"
+    fi
+
+    # Generar index.php para que el servidor integrado de PHP (artisan serve) sirva el index.html en /jugador/
+    cat << 'EOF' > "$LARAVEL_DIR/public/jugador/index.php"
+<?php
+// Fallback para el servidor de desarrollo de PHP
+readfile(__DIR__ . '/index.html');
+EOF
 fi
 
 # 2. Preparar base de datos y estado inicial de la demo en Laravel
