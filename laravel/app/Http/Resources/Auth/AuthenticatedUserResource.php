@@ -27,8 +27,11 @@ class AuthenticatedUserResource extends JsonResource
             ? $this->role
             : UserRoleEnum::tryFrom((string) $this->role) ?? UserRoleEnum::JUGADOR;
 
+        $contexto = $this->resolverContextoPorRol($role);
+
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'nombre_completo' => $this->name,
             'email' => $this->email,
             'role' => $role->value,
@@ -36,7 +39,10 @@ class AuthenticatedUserResource extends JsonResource
             'avatar_url' => $this->avatar_url,
             'telefono' => $this->telefono,
             'activo' => (bool) $this->activo,
-            'contexto' => $this->resolverContextoPorRol($role),
+            'contexto' => $contexto,
+            ...($role === UserRoleEnum::COACH ? [
+                'equipos_dirigidos' => $contexto['equipos_dirigidos'] ?? [],
+            ] : []),
         ];
     }
 
@@ -55,6 +61,7 @@ class AuthenticatedUserResource extends JsonResource
                     'nombre' => $e->nombre,
                     'club' => $e->club?->nombreConSiglas(),
                     'disciplina' => $e->disciplina?->nombre,
+                    'quorum_minimo' => $e->disciplina?->quorum_minimo_practica ?? 4,
                 ])->values()->all(),
             ],
             UserRoleEnum::ADMIN_CLUB => [

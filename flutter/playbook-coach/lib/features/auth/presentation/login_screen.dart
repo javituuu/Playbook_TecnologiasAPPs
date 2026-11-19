@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               onChanged: _onFieldChanged,
                               decoration: InputDecoration(
                                 labelText: 'Correo electrónico',
-                                hintText: 'coach@udd.cl',
+                                hintText: 'coach.martinez@udd.cl',
                                 prefixIcon: const Icon(Icons.mail_outline),
                                 errorText: controller.fieldError('email'),
                               ),
@@ -271,6 +271,27 @@ class _LoginScreenState extends State<LoginScreen> {
                                   '• Coach: ${MockAuthDataSource.demoCoachEmail}\n'
                                   '• Jugador (403): ${MockAuthDataSource.demoPlayerEmail}\n'
                                   '• Límite (429): ${MockAuthDataSource.rateLimitedEmail}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: PlaybookTheme.dustyGrape,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ] else ...<Widget>[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: PlaybookColors.surfaceMuted,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: PlaybookColors.border,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Cuentas backend (clave: password):\n'
+                                  '• Coach LoL: coach.martinez@udd.cl (o coach@udd.cl)\n'
+                                  '• Coach Valorant: coach.rojas@udd.cl',
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: PlaybookTheme.dustyGrape,
                                     height: 1.4,

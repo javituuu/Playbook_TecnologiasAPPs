@@ -30,6 +30,7 @@ class RemoteAuthDataSource implements AuthDataSource {
         'email': email.trim(),
         'password': password,
         'device_name': 'playbook_coach_flutter',
+        'rol_esperado': 'coach',
       },
     );
 
