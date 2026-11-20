@@ -41,8 +41,8 @@ class PanelWebTest extends TestCase
             ->assertSee('Equilibrio local / visita')
             ->assertSee('Descanso mínimo')
             ->assertSee('Penalización')
-            ->assertSee('CHOQUE_MULTI_LIGA')
-            ->assertSee('DESCANSO_INSUFICIENTE');
+            ->assertSee('Conflicto · choque multi liga')
+            ->assertSee('Advertencia · descanso insuficiente');
     }
 
     public function test_publicar_fixture_se_bloquea_cuando_existen_violaciones_duras(): void

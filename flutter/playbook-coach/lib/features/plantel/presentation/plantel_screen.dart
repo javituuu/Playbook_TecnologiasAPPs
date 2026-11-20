@@ -233,7 +233,7 @@ class _CoberturaCard extends StatelessWidget {
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: sinTitular.isEmpty
-                          ? PlaybookColors.carbon
+                          ? Theme.of(context).colorScheme.onSurface
                           : theme.colorScheme.error,
                     ),
                   ),
@@ -322,7 +322,7 @@ class _PosicionCoberturaChip extends StatelessWidget {
                     : Icons.error_outline_rounded,
                 size: 16,
                 color: isCovered
-                    ? PlaybookColors.carbon
+                    ? Theme.of(context).colorScheme.onSurface
                     : theme.colorScheme.error,
               ),
               const SizedBox(width: 6),
@@ -453,7 +453,7 @@ class _MiembroPlantelCard extends StatelessWidget {
                       'Capitán',
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: PlaybookColors.carbon,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -467,17 +467,17 @@ class _MiembroPlantelCard extends StatelessWidget {
                 _InfoTag(
                   icon: Icons.sports_esports_outlined,
                   label: 'Principal: ${miembro.posicionPrincipal}',
-                  backgroundColor:
-                      PlaybookColors.dustyGrape.withValues(alpha: 0.12),
-                  foregroundColor: PlaybookColors.dustyGrape,
+                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  foregroundColor: theme.colorScheme.primary,
                 ),
                 if (miembro.posicionSecundaria != null)
                   _InfoTag(
                     icon: Icons.swap_calls_rounded,
                     label: 'Secundaria: ${miembro.posicionSecundaria}',
-                    backgroundColor:
-                        PlaybookColors.coolSteel.withValues(alpha: 0.20),
-                    foregroundColor: PlaybookColors.carbon,
+                    backgroundColor: PlaybookColors.coolSteel.withValues(
+                      alpha: 0.20,
+                    ),
+                    foregroundColor: theme.colorScheme.onSurface,
                   ),
               ],
             ),

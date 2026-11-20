@@ -17,19 +17,17 @@ class PlaybookColors {
   static const Color coolSteel = Color(0xFF95A3B3);
 
   // Superficies y neutros complementarios (modo claro)
-  static const Color canvas = Color(0xFFF8FAFC);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceMuted = Color(0xFFF1F5F9);
-  static const Color border = Color(0xFFE2E8F0);
+  static const Color surfaceMuted = Color(0xFFECEEF1);
+  static const Color border = Color(0xFFD5D9E0);
 
   // Superficies complementarias (modo oscuro)
-  static const Color darkCanvas = Color(0xFF181920);
   static const Color darkSurface = carbon;
-  static const Color darkSurfaceElevated = Color(0xFF2C2E3B);
-  static const Color darkBorder = Color(0xFF3A3D4D);
+  static const Color darkSurfaceElevated = Color(0xFF343644);
+  static const Color darkBorder = Color(0xFF4B4E6D);
 
   // Semántica general
-  static const Color error = Color(0xFFDC2626);
+  static const Color error = Color(0xFFB3261E);
   static const Color errorContainer = Color(0xFFFEE2E2);
 }
 
@@ -83,18 +81,18 @@ class PlaybookHeatmapTheme extends ThemeExtension<PlaybookHeatmapTheme> {
   /// Paleta estándar del heatmap alineada al diseño de Playbook Coach.
   static const PlaybookHeatmapTheme standard = PlaybookHeatmapTheme(
     level5: HeatmapTone(
-      background: Color(0xFFDCFCE7),
-      foreground: Color(0xFF166534),
-      border: Color(0xFFBBF7D0),
+      background: Color(0xFFD9F7EE),
+      foreground: Color(0xFF0E705B),
+      border: Color(0xFF84DCC6),
     ),
     level4: HeatmapTone(
       background: Color(0xFFF0FDF4),
-      foreground: Color(0xFF15803D),
-      border: Color(0xFFDCFCE7),
+      foreground: Color(0xFF0E705B),
+      border: Color(0xFFD9F7EE),
     ),
     level3: HeatmapTone(
       background: Color(0xFFFEF9C3),
-      foreground: Color(0xFF854D0E),
+      foreground: Color(0xFF8A5A00),
       border: Color(0xFFFEF08A),
     ),
     level2: HeatmapTone(
@@ -109,8 +107,41 @@ class PlaybookHeatmapTheme extends ThemeExtension<PlaybookHeatmapTheme> {
     ),
     level0: HeatmapTone(
       background: Color(0xFFFEE2E2),
-      foreground: Color(0xFF991B1B),
+      foreground: Color(0xFFB3261E),
       border: Color(0xFFFECACA),
+    ),
+  );
+
+  static const PlaybookHeatmapTheme dark = PlaybookHeatmapTheme(
+    level5: HeatmapTone(
+      background: Color(0xFF245449),
+      foreground: PlaybookColors.pearlAqua,
+      border: Color(0xFF35675B),
+    ),
+    level4: HeatmapTone(
+      background: Color(0xFF293E3A),
+      foreground: PlaybookColors.pearlAqua,
+      border: Color(0xFF34524C),
+    ),
+    level3: HeatmapTone(
+      background: Color(0xFF4A3C26),
+      foreground: Color(0xFFF2C879),
+      border: Color(0xFF645436),
+    ),
+    level2: HeatmapTone(
+      background: Color(0xFF512F25),
+      foreground: Color(0xFFFFB28A),
+      border: Color(0xFF673E32),
+    ),
+    level1: HeatmapTone(
+      background: Color(0xFF4B2B3D),
+      foreground: Color(0xFFF5A9CC),
+      border: Color(0xFF63394F),
+    ),
+    level0: HeatmapTone(
+      background: Color(0xFF542826),
+      foreground: Color(0xFFF28B82),
+      border: Color(0xFF6C3532),
     ),
   );
 
@@ -242,16 +273,16 @@ class PlaybookTheme {
       error: PlaybookColors.error,
       onError: Colors.white,
       errorContainer: PlaybookColors.errorContainer,
-      onErrorContainer: Color(0xFF991B1B),
+      onErrorContainer: Color(0xFFB3261E),
       surface: PlaybookColors.surface,
       onSurface: PlaybookColors.carbon,
       surfaceContainerLowest: Colors.white,
-      surfaceContainerLow: PlaybookColors.canvas,
+      surfaceContainerLow: PlaybookColors.surface,
       surfaceContainer: PlaybookColors.surfaceMuted,
-      surfaceContainerHigh: Color(0xFFE8EEF5),
+      surfaceContainerHigh: Color(0xFFE3E4EE),
       surfaceContainerHighest: PlaybookColors.border,
-      onSurfaceVariant: PlaybookColors.coolSteel,
-      outline: PlaybookColors.coolSteel,
+      onSurfaceVariant: PlaybookColors.dustyGrape,
+      outline: Color(0xFF747A8D),
       outlineVariant: PlaybookColors.border,
       shadow: Color(0x14222222),
       scrim: Color(0x66222222),
@@ -260,119 +291,7 @@ class PlaybookTheme {
       inversePrimary: PlaybookColors.pearlAqua,
     );
 
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: colorScheme,
-      scaffoldBackgroundColor: PlaybookColors.canvas,
-      dividerColor: PlaybookColors.border,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: PlaybookColors.surface,
-        foregroundColor: PlaybookColors.carbon,
-        elevation: 0,
-        scrolledUnderElevation: 1,
-        centerTitle: false,
-        surfaceTintColor: Colors.transparent,
-      ),
-      cardTheme: CardThemeData(
-        color: PlaybookColors.surface,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: PlaybookColors.border),
-        ),
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: PlaybookColors.dustyGrape,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(0, 46),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: PlaybookColors.dustyGrape,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          minimumSize: const Size(0, 46),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: PlaybookColors.dustyGrape,
-          side: const BorderSide(color: PlaybookColors.coolSteel),
-          minimumSize: const Size(0, 46),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: PlaybookColors.surface,
-        hintStyle: const TextStyle(color: PlaybookColors.coolSteel),
-        labelStyle: const TextStyle(color: PlaybookColors.dustyGrape),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 14,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: PlaybookColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: PlaybookColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: PlaybookColors.dustyGrape,
-            width: 1.5,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: PlaybookColors.error),
-        ),
-      ),
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: PlaybookColors.surface,
-        indicatorColor: PlaybookColors.pearlAqua.withValues(alpha: 0.35),
-        labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          final isSelected = states.contains(WidgetState.selected);
-          return TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: isSelected
-                ? PlaybookColors.carbon
-                : PlaybookColors.coolSteel,
-          );
-        }),
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          final isSelected = states.contains(WidgetState.selected);
-          return IconThemeData(
-            color: isSelected
-                ? PlaybookColors.dustyGrape
-                : PlaybookColors.coolSteel,
-          );
-        }),
-      ),
-      dividerTheme: const DividerThemeData(
-        color: PlaybookColors.border,
-        thickness: 1,
-        space: 1,
-      ),
-      extensions: const <ThemeExtension<dynamic>>[
-        PlaybookHeatmapTheme.standard,
-      ],
-    );
+    return _build(colorScheme, PlaybookHeatmapTheme.standard);
   }
 
   /// Tema oscuro alternativo apoyado en Carbon (`#222222`) y Pearl Aqua (`#84DCC6`).
@@ -383,60 +302,156 @@ class PlaybookTheme {
       onPrimary: PlaybookColors.carbon,
       primaryContainer: PlaybookColors.dustyGrape,
       onPrimaryContainer: Colors.white,
-      secondary: PlaybookColors.dustyGrape,
-      onSecondary: Colors.white,
+      secondary: PlaybookColors.coolSteel,
+      onSecondary: PlaybookColors.carbon,
       secondaryContainer: PlaybookColors.darkSurfaceElevated,
       onSecondaryContainer: PlaybookColors.pearlAqua,
       tertiary: PlaybookColors.coolSteel,
       onTertiary: PlaybookColors.carbon,
       tertiaryContainer: PlaybookColors.darkSurfaceElevated,
       onTertiaryContainer: Colors.white,
-      error: Color(0xFFF87171),
+      error: Color(0xFFFFAFA7),
       onError: PlaybookColors.carbon,
       errorContainer: Color(0xFF7F1D1D),
       onErrorContainer: Color(0xFFFEE2E2),
       surface: PlaybookColors.darkSurface,
       onSurface: Colors.white,
-      surfaceContainerLowest: PlaybookColors.darkCanvas,
+      surfaceContainerLowest: PlaybookColors.darkSurface,
       surfaceContainerLow: PlaybookColors.darkSurface,
       surfaceContainer: PlaybookColors.darkSurfaceElevated,
-      surfaceContainerHigh: Color(0xFF343746),
+      surfaceContainerHigh: Color(0xFF3D4052),
       surfaceContainerHighest: PlaybookColors.darkBorder,
-      onSurfaceVariant: PlaybookColors.coolSteel,
+      onSurfaceVariant: Color(0xFFA5B2C0),
       outline: PlaybookColors.coolSteel,
       outlineVariant: PlaybookColors.darkBorder,
       shadow: Colors.black,
       scrim: Colors.black87,
-      inverseSurface: PlaybookColors.canvas,
+      inverseSurface: PlaybookColors.surface,
       onInverseSurface: PlaybookColors.carbon,
       inversePrimary: PlaybookColors.dustyGrape,
     );
 
-    return ThemeData(
+    return _build(colorScheme, PlaybookHeatmapTheme.dark);
+  }
+
+  static Color success(ColorScheme colors) => colors.brightness == Brightness.dark
+      ? PlaybookColors.pearlAqua
+      : const Color(0xFF0E705B);
+
+  static Color warning(ColorScheme colors) => colors.brightness == Brightness.dark
+      ? const Color(0xFFF2C879)
+      : const Color(0xFF8A5A00);
+
+  static ThemeData _build(ColorScheme colors, PlaybookHeatmapTheme heatmap) {
+    final base = ThemeData(
       useMaterial3: true,
-      colorScheme: colorScheme,
-      scaffoldBackgroundColor: PlaybookColors.darkCanvas,
-      dividerColor: PlaybookColors.darkBorder,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: PlaybookColors.darkSurface,
-        foregroundColor: Colors.white,
+      colorScheme: colors,
+      fontFamily: 'Inter',
+      scaffoldBackgroundColor: colors.surface,
+      dividerColor: colors.outlineVariant,
+    );
+    TextStyle? heading(TextStyle? style) =>
+        style?.copyWith(fontFamily: 'League Spartan', fontWeight: FontWeight.w800);
+
+    return base.copyWith(
+      textTheme: base.textTheme.copyWith(
+        headlineSmall: heading(base.textTheme.headlineSmall),
+        titleLarge: heading(base.textTheme.titleLarge),
+        titleMedium: heading(base.textTheme.titleMedium),
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
         elevation: 0,
-        scrolledUnderElevation: 1,
+        scrolledUnderElevation: 0,
         centerTitle: false,
         surfaceTintColor: Colors.transparent,
       ),
       cardTheme: CardThemeData(
-        color: PlaybookColors.darkSurface,
+        color: colors.surfaceContainerLow,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: PlaybookColors.darkBorder),
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: colors.outlineVariant),
         ),
       ),
-      extensions: const <ThemeExtension<dynamic>>[
-        PlaybookHeatmapTheme.standard,
-      ],
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(0, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colors.primary,
+          foregroundColor: colors.onPrimary,
+          elevation: 0,
+          minimumSize: const Size(0, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colors.primary,
+          side: BorderSide(color: colors.outline),
+          minimumSize: const Size(0, 48),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationThemeData(
+        filled: true,
+        fillColor: colors.surface,
+        hintStyle: TextStyle(color: colors.onSurfaceVariant),
+        labelStyle: TextStyle(color: colors.onSurfaceVariant),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colors.outline),
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colors.primary, width: 2),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: colors.surfaceContainer,
+        indicatorColor: colors.secondaryContainer,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected ? colors.onSurface : colors.onSurfaceVariant,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          return IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? colors.onSecondaryContainer
+                : colors.onSurfaceVariant,
+          );
+        }),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: colors.surfaceContainer,
+        indicatorColor: colors.secondaryContainer,
+        selectedIconTheme: IconThemeData(color: colors.onSecondaryContainer),
+        unselectedIconTheme: IconThemeData(color: colors.onSurfaceVariant),
+        selectedLabelTextStyle: TextStyle(
+          color: colors.onSurface,
+          fontWeight: FontWeight.w700,
+        ),
+        unselectedLabelTextStyle: TextStyle(color: colors.onSurfaceVariant),
+      ),
+      dividerTheme: DividerThemeData(
+        color: colors.outlineVariant,
+        thickness: 1,
+        space: 1,
+      ),
+      extensions: [heatmap],
     );
   }
 }

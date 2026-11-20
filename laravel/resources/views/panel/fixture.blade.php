@@ -116,7 +116,7 @@
                                 <x-icono nombre="alert-circle-outline" />
                                 <div class="aviso__cuerpo">
                                     <div class="aviso__cabecera">
-                                        <strong>Conflicto ({{ $alerta['codigo_regla'] }})</strong>
+                                        <strong>Conflicto · {{ \Illuminate\Support\Str::of($alerta['codigo_regla'])->replace('_', ' ')->lower() }}</strong>
                                         @if (isset($alerta['partido_id']))
                                             <a
                                                 class="enlace-accion enlace-accion--icono"
@@ -137,7 +137,7 @@
                                 <x-icono nombre="alert-circle-outline" />
                                 <div class="aviso__cuerpo">
                                     <div class="aviso__cabecera">
-                                        <strong>Advertencia ({{ $alerta['codigo_regla'] }})</strong>
+                                        <strong>Advertencia · {{ \Illuminate\Support\Str::of($alerta['codigo_regla'])->replace('_', ' ')->lower() }}</strong>
                                         @if (isset($alerta['partido_id']))
                                             <a
                                                 class="enlace-accion enlace-accion--icono"
@@ -256,7 +256,7 @@
         </section>
     @empty
         <div class="vacio">
-            <x-icono nombre="calendar-outline" />
+            <img src="{{ asset('images/fixture-vacio.svg') }}" width="96" height="72" alt="">
             <p>Todavía no hay partidos cargados.</p>
         </div>
     @endforelse

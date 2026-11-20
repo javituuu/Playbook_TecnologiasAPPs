@@ -3,11 +3,13 @@
 @section('titulo', 'Iniciar sesión')
 
 @section('contenido')
-    <header class="cabecera">
+    <header class="cabecera cabecera--acceso">
         <h1>Iniciar sesión</h1>
         <p>
             Ingresa con tu cuenta de organizador o directiva de club para gestionar ligas, partidos y planteles.
         </p>
+        <img class="login-visual" src="{{ asset('images/playbook-panel.webp') }}"
+            width="900" height="720" loading="lazy" alt="">
     </header>
 
     <div class="login-layout">
@@ -31,7 +33,7 @@
                                 name="email"
                                 value="{{ old('email', 'directiva.liga@playbook.cl') }}"
                                 required
-                                autofocus
+                                autocomplete="username"
                                 class="control control--con-icono"
                                 placeholder="directiva.liga@playbook.cl"
                             >

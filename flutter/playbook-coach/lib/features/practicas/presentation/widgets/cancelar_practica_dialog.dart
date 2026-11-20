@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../../../../app/theme/playbook_theme.dart';
 import '../../domain/practica.dart';
 import '../practicas_controller.dart';
 
@@ -56,6 +55,7 @@ class _CancelarPracticaDialogState extends State<_CancelarPracticaDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return AlertDialog(
       title: const Text('Cancelar práctica'),
       content: SizedBox(
@@ -67,10 +67,7 @@ class _CancelarPracticaDialogState extends State<_CancelarPracticaDialog> {
             children: <Widget>[
               Text(
                 '¿Deseas cancelar la práctica vs ${widget.practica.rival} (${widget.practica.horarioResumen})?',
-                style: const TextStyle(
-                  fontSize: 13.5,
-                  color: PlaybookTheme.carbon,
-                ),
+                style: TextStyle(fontSize: 13.5, color: colors.onSurface),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -95,8 +92,8 @@ class _CancelarPracticaDialogState extends State<_CancelarPracticaDialog> {
         FilledButton(
           key: const Key('confirm_cancel_practice_button'),
           style: FilledButton.styleFrom(
-            backgroundColor: PlaybookColors.error,
-            foregroundColor: Colors.white,
+            backgroundColor: colors.error,
+            foregroundColor: colors.onError,
           ),
           onPressed: () {
             final reason = _motivoController.text.trim();

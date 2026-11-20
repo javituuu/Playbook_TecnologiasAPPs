@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
+        child: _LoginBackdrop(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
             child: ConstrainedBox(
@@ -90,20 +90,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      Text(
-                                        'Playbook Coach',
-                                        style: theme.textTheme.titleLarge
-                                            ?.copyWith(
-                                          fontWeight: FontWeight.w700,
-                                          color: PlaybookTheme.carbon,
-                                        ),
-                                      ),
+                                      const PlaybookCoachWordmark(fontSize: 28),
                                       const SizedBox(height: 2),
                                       Text(
                                         'Panel técnico de disponibilidad, prácticas y nóminas',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                          color: PlaybookTheme.coolSteel,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                     ],
@@ -199,12 +191,12 @@ class _LoginScreenState extends State<LoginScreen> {
                               key: const Key('login_submit_button'),
                               onPressed: isBusy ? null : _submit,
                               child: isBusy
-                                  ? const SizedBox(
+                                  ? SizedBox(
                                       height: 20,
                                       width: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2.2,
-                                        color: Colors.white,
+                                        color: theme.colorScheme.onPrimary,
                                       ),
                                     )
                                   : const Text('Iniciar sesión'),
@@ -221,9 +213,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     children: <Widget>[
                                       Text(
                                         'Entorno de pruebas (Mock)',
-                                        style: theme.textTheme.labelLarge
-                                            ?.copyWith(
-                                          color: PlaybookTheme.carbon,
+                                        style: theme.textTheme.labelLarge?.copyWith(
+                                          color: theme.colorScheme.onSurface,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -231,9 +222,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         controller.isMockMode
                                             ? 'Simula login, 401, 403 jugador y 429'
                                             : 'Conectado a API remota',
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                          color: PlaybookTheme.coolSteel,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                     ],
@@ -260,10 +250,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: PlaybookColors.surfaceMuted,
+                                  color: theme.colorScheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: PlaybookColors.border,
+                                    color: theme.colorScheme.outlineVariant,
                                   ),
                                 ),
                                 child: Text(
@@ -272,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   '• Jugador (403): ${MockAuthDataSource.demoPlayerEmail}\n'
                                   '• Límite (429): ${MockAuthDataSource.rateLimitedEmail}',
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: PlaybookTheme.dustyGrape,
+                                    color: theme.colorScheme.primary,
                                     height: 1.4,
                                   ),
                                 ),
@@ -282,10 +272,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: PlaybookColors.surfaceMuted,
+                                  color: theme.colorScheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: PlaybookColors.border,
+                                    color: theme.colorScheme.outlineVariant,
                                   ),
                                 ),
                                 child: Text(
@@ -293,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   '• Coach LoL: coach.martinez@udd.cl (o coach@udd.cl)\n'
                                   '• Coach Valorant: coach.rojas@udd.cl',
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: PlaybookTheme.dustyGrape,
+                                    color: theme.colorScheme.primary,
                                     height: 1.4,
                                   ),
                                 ),
@@ -314,6 +304,43 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+class _LoginBackdrop extends StatelessWidget {
+  const _LoginBackdrop({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final form = Center(child: child);
+        if (constraints.maxWidth < 880) return form;
+
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Align(
+              alignment: const AlignmentDirectional(0.9, -0.62),
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: 0.35,
+                  child: Image.asset(
+                    'assets/brand/playbook-coach.webp',
+                    width: (constraints.maxWidth * 0.28).clamp(240.0, 380.0),
+                    fit: BoxFit.contain,
+                    excludeFromSemantics: true,
+                  ),
+                ),
+              ),
+            ),
+            form,
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _LoginErrorBanner extends StatelessWidget {
   const _LoginErrorBanner({
     super.key,
@@ -330,103 +357,112 @@ class _LoginErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = _resolvePresentation(errorType, statusCode);
+    final tones = Theme.of(context).extension<PlaybookHeatmapTheme>() ??
+        PlaybookHeatmapTheme.standard;
+    final config = _resolvePresentation(errorType, statusCode, tones);
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: config.background,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: config.border),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Icon(config.icon, color: config.foreground, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  config.title,
-                  style: TextStyle(
-                    color: config.foreground,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  message,
-                  style: TextStyle(
-                    color: config.foreground,
-                    fontSize: 12.5,
-                    height: 1.35,
-                  ),
-                ),
-                if (errorType == ApiErrorType.rateLimited &&
-                    retryAfterSeconds != null &&
-                    retryAfterSeconds! > 0) ...<Widget>[
-                  const SizedBox(height: 4),
+    return Semantics(
+      liveRegion: true,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: config.background,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: config.border),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Icon(config.icon, color: config.foreground, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
                   Text(
-                    'Espera sugerida: $retryAfterSeconds s',
+                    config.title,
                     style: TextStyle(
                       color: config.foreground,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
                     ),
                   ),
+                  const SizedBox(height: 2),
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: config.foreground,
+                      fontSize: 12.5,
+                      height: 1.35,
+                    ),
+                  ),
+                  if (errorType == ApiErrorType.rateLimited &&
+                      retryAfterSeconds != null &&
+                      retryAfterSeconds! > 0) ...<Widget>[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Espera sugerida: $retryAfterSeconds s',
+                      style: TextStyle(
+                        color: config.foreground,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  _ErrorBannerStyle _resolvePresentation(ApiErrorType? type, int? code) {
+  _ErrorBannerStyle _resolvePresentation(
+    ApiErrorType? type,
+    int? code,
+    PlaybookHeatmapTheme tones,
+  ) {
     switch (type) {
       case ApiErrorType.forbidden:
         return _ErrorBannerStyle(
           title: 'Acceso restringido (${code ?? 403})',
           icon: Icons.block_rounded,
-          background: PlaybookTheme.heatmap0.background,
-          foreground: PlaybookTheme.heatmap0.foreground,
-          border: PlaybookTheme.heatmap0.border,
+          background: tones.level0.background,
+          foreground: tones.level0.foreground,
+          border: tones.level0.border,
         );
       case ApiErrorType.rateLimited:
         return _ErrorBannerStyle(
           title: 'Demasiados intentos (${code ?? 429})',
           icon: Icons.timer_outlined,
-          background: PlaybookTheme.heatmap2.background,
-          foreground: PlaybookTheme.heatmap2.foreground,
-          border: PlaybookTheme.heatmap2.border,
+          background: tones.level2.background,
+          foreground: tones.level2.foreground,
+          border: tones.level2.border,
         );
       case ApiErrorType.unauthorized:
         return _ErrorBannerStyle(
           title: 'Credenciales o sesión inválida (${code ?? 401})',
           icon: Icons.lock_outline_rounded,
-          background: PlaybookTheme.heatmap1.background,
-          foreground: PlaybookTheme.heatmap1.foreground,
-          border: PlaybookTheme.heatmap1.border,
+          background: tones.level1.background,
+          foreground: tones.level1.foreground,
+          border: tones.level1.border,
         );
       case ApiErrorType.validation:
         return _ErrorBannerStyle(
           title: 'Revisa los datos ingresados (${code ?? 422})',
           icon: Icons.error_outline_rounded,
-          background: PlaybookTheme.heatmap2.background,
-          foreground: PlaybookTheme.heatmap2.foreground,
-          border: PlaybookTheme.heatmap2.border,
+          background: tones.level2.background,
+          foreground: tones.level2.foreground,
+          border: tones.level2.border,
         );
       default:
         return _ErrorBannerStyle(
           title: code != null ? 'Error HTTP $code' : 'No se pudo iniciar sesión',
           icon: Icons.wifi_off_rounded,
-          background: PlaybookTheme.heatmap1.background,
-          foreground: PlaybookTheme.heatmap1.foreground,
-          border: PlaybookTheme.heatmap1.border,
+          background: tones.level1.background,
+          foreground: tones.level1.foreground,
+          border: tones.level1.border,
         );
     }
   }

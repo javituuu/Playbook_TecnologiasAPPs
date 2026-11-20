@@ -88,7 +88,6 @@ class _PlaybookCoachAppState extends State<PlaybookCoachApp> {
       debugShowCheckedModeBanner: false,
       theme: PlaybookTheme.light(),
       darkTheme: PlaybookTheme.dark(),
-      themeMode: ThemeMode.light,
       home: ListenableBuilder(
         listenable: _authController,
         builder: (context, _) {
@@ -120,13 +119,7 @@ class _SessionSplash extends StatelessWidget {
           children: <Widget>[
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text(
-              'Verificando sesión del Coach...',
-              style: TextStyle(
-                color: PlaybookTheme.dustyGrape,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Text('Verificando sesión del coach…'),
           ],
         ),
       ),

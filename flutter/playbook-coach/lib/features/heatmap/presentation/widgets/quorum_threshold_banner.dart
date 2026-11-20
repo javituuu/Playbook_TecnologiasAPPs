@@ -15,16 +15,15 @@ class QuorumThresholdBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final warning = PlaybookTheme.warning(colors);
     return CustomPaint(
-      painter: const _DashedRoundedBorderPainter(
-        color: Color(0xFFF59E0B),
-        radius: 10,
-      ),
+      painter: _DashedRoundedBorderPainter(color: warning, radius: 10),
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFBEB),
+          color: warning.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Wrap(
@@ -35,13 +34,13 @@ class QuorumThresholdBanner extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF3C7),
+                color: warning.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 'UMBRAL DE QUÓRUM ($quorumMinimo/$totalJugadores)',
-                style: const TextStyle(
-                  color: Color(0xFFB45309),
+                style: TextStyle(
+                  color: warning,
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.4,
@@ -49,9 +48,9 @@ class QuorumThresholdBanner extends StatelessWidget {
               ),
             ),
             Text(
-              'Los bloques amarillos, naranjas y rojos no alcanzan el quórum mínimo sugerido de $quorumMinimo jugadores disponibles para reservar práctica.',
-              style: const TextStyle(
-                color: PlaybookTheme.dustyGrape,
+              'Para agendar una práctica, el bloque debe tener al menos $quorumMinimo jugadores disponibles.',
+              style: TextStyle(
+                color: colors.onSurface,
                 fontSize: 12.5,
                 height: 1.35,
               ),
