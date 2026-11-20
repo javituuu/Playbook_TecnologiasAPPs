@@ -84,7 +84,7 @@ class _IntercambiarNominaDialogState extends State<IntercambiarNominaDialog> {
               Text(
                 'Sale de titular',
                 style: theme.textTheme.labelLarge?.copyWith(
-                  color: PlaybookColors.dustyGrape,
+                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -104,7 +104,7 @@ class _IntercambiarNominaDialogState extends State<IntercambiarNominaDialog> {
               Text(
                 'Ingresa como titular (suplente)',
                 style: theme.textTheme.labelLarge?.copyWith(
-                  color: PlaybookColors.dustyGrape,
+                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 8),
@@ -166,7 +166,7 @@ class _SelectablePlayerTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final borderColor = selected
-        ? PlaybookColors.dustyGrape
+        ? theme.colorScheme.primary
         : theme.colorScheme.outlineVariant;
 
     return Padding(
@@ -194,7 +194,7 @@ class _SelectablePlayerTile extends StatelessWidget {
                     : Icons.radio_button_off_rounded,
                 size: 20,
                 color: selected
-                    ? PlaybookColors.dustyGrape
+                    ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
               ),
               const SizedBox(width: 10),
@@ -239,19 +239,20 @@ class _EstadoBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final (bg, fg) = switch (estado) {
       EstadoCitacion.confirmado => (
-          PlaybookColors.pearlAqua.withValues(alpha: 0.24),
-          PlaybookColors.carbon,
-        ),
+        PlaybookTheme.success(colors).withValues(alpha: 0.12),
+        PlaybookTheme.success(colors),
+      ),
       EstadoCitacion.pendiente => (
-          PlaybookColors.coolSteel.withValues(alpha: 0.22),
-          PlaybookColors.dustyGrape,
-        ),
+        PlaybookTheme.warning(colors).withValues(alpha: 0.10),
+        PlaybookTheme.warning(colors),
+      ),
       EstadoCitacion.rechazado => (
-          Theme.of(context).colorScheme.error.withValues(alpha: 0.14),
-          Theme.of(context).colorScheme.error,
-        ),
+        colors.error.withValues(alpha: 0.14),
+        colors.error,
+      ),
     };
 
     return Container(

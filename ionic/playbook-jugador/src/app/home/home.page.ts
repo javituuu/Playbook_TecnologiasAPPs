@@ -110,6 +110,10 @@ export class HomePage implements OnInit {
     });
   }
 
+  nombreRival(nombre: string): string {
+    return nombre && nombre !== '-' ? nombre : 'Por confirmar';
+  }
+
   cargarAgenda() {
     this.cargandoAgenda = true;
     this.errorAgenda = false;

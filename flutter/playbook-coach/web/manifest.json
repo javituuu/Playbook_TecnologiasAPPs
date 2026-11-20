@@ -1,12 +1,11 @@
 {
-    "name": "playbook_coach",
-    "short_name": "playbook_coach",
+    "name": "Playbook Coach",
+    "short_name": "Playbook Coach",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
+    "background_color": "#222222",
+    "theme_color": "#222222",
     "description": "Playbook - App del Coach (Disponibilidad, Practicas, Nominas y Plantel)",
-    "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {

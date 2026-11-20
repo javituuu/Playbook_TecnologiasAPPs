@@ -43,6 +43,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: PlaybookTheme.light(),
+        darkTheme: PlaybookTheme.dark(),
         home: CoachShell(controller: controller),
       ),
     );
@@ -105,5 +106,23 @@ void main() {
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
     expect(find.text('Sesión activa: Coach Martínez'), findsOneWidget);
+  });
+
+  testWidgets('adapta la navegación al girar un móvil con texto ampliado', (
+    WidgetTester tester,
+  ) async {
+    final dispatcher = tester.platformDispatcher;
+    dispatcher.textScaleFactorTestValue = 1.5;
+    dispatcher.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(dispatcher.clearTextScaleFactorTestValue);
+    addTearDown(dispatcher.clearPlatformBrightnessTestValue);
+
+    await pumpShellAtSize(tester, const Size(320, 640));
+    expect(find.byType(NavigationBar), findsOneWidget);
+
+    tester.view.physicalSize = const Size(568, 320);
+    await tester.pumpAndSettle();
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byKey(const Key('team_selector_dropdown')), findsOneWidget);
   });
 }

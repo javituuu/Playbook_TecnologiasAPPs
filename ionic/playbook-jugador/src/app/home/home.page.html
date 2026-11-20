@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
     <img slot="start" class="logo-header" src="assets/logo/playbook-mark.svg" alt="" width="28" height="28">
     <ion-title>
@@ -10,7 +10,7 @@
 </ion-header>
 
 <ion-content>
-  <div class="page-wrap">
+  <main class="page-wrap">
 
     <!-- Agenda -->
     <div *ngIf="pestanaActiva === 'agenda'" class="panel">
@@ -30,23 +30,26 @@
         <ion-button (click)="cargarAgenda()" fill="outline">Reintentar</ion-button>
       </div>
 
-      <div *ngIf="!cargandoAgenda && !errorAgenda">
+      <div *ngIf="!cargandoAgenda && !errorAgenda" [class.agenda-amplia]="agenda.length > 1">
         <ion-card *ngIf="agenda.length > 0" class="marcador" [class.en-conflicto]="agenda[0].estado === 'conflicto'">
           <ion-card-header>
             <ion-card-subtitle>{{ agenda[0].liga }}</ion-card-subtitle>
-            <ion-card-title><span class="equipo">{{ agenda[0].equipo_local }}</span> <span class="vs">vs</span> <span class="equipo">{{ agenda[0].equipo_visitante }}</span></ion-card-title>
+            <ion-card-title><span class="equipo">{{ agenda[0].equipo_local }}</span> <span class="vs">vs</span> <span class="equipo">{{ nombreRival(agenda[0].equipo_visitante) }}</span></ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <p class="hora">{{ agenda[0].fecha_hora | date:'dd/MM · HH:mm' }} · {{ agenda[0].lugar }}</p>
+            <p class="partido-meta">
+              <span class="hora">{{ agenda[0].fecha_hora | date:'dd/MM · HH:mm' }}</span>
+              <span>{{ agenda[0].lugar }}</span>
+            </p>
             <span *ngIf="agenda[0].estado !== 'conflicto'" class="chip-estado chip-confirmado"><ion-icon name="checkmark-circle-outline"></ion-icon>Confirmado</span>
             <span *ngIf="agenda[0].estado === 'conflicto'" class="chip-estado chip-conflicto"><ion-icon name="alert-circle-outline"></ion-icon>Conflicto de horario</span>
           </ion-card-content>
         </ion-card>
 
-        <ion-list *ngIf="agenda.length > 1" lines="full">
-          <ion-item *ngFor="let p of agenda.slice(1); let i = index" [style.--i]="i + 1" [class.en-conflicto]="p.estado === 'conflicto'">
-            <ion-label>
-              {{ p.equipo_local }} <span class="vs">vs</span> {{ p.equipo_visitante }}
+        <ion-list *ngIf="agenda.length > 1" lines="full" aria-label="Próximos partidos">
+          <ion-item *ngFor="let p of agenda.slice(1)" [class.en-conflicto]="p.estado === 'conflicto'">
+            <ion-label class="ion-text-wrap">
+              {{ p.equipo_local }} <span class="vs">vs</span> {{ nombreRival(p.equipo_visitante) }}
               <span *ngIf="p.estado === 'conflicto'" class="chip-estado chip-conflicto"><ion-icon name="alert-circle-outline"></ion-icon>Conflicto de horario</span>
             </ion-label>
             <ion-label slot="end" class="hora">{{ p.fecha_hora | date:'dd/MM · HH:mm' }}</ion-label>
@@ -54,7 +57,7 @@
         </ion-list>
 
         <div *ngIf="agenda.length === 0" class="estado">
-          <ion-icon name="calendar-clear-outline"></ion-icon>
+          <img src="assets/illustrations/agenda.svg" width="96" height="72" alt="">
           <p>Aún no tienes partidos en tu agenda.</p>
           <p class="ayuda">Cuando aceptes una citación, aparecerá aquí.</p>
           <ion-button fill="outline" (click)="cambiarPestana('citaciones')">Ver citaciones</ion-button>
@@ -80,14 +83,14 @@
         <ion-button (click)="cargarCitaciones()" fill="outline">Reintentar</ion-button>
       </div>
 
-      <div *ngIf="!cargandoCitaciones && !errorCitaciones">
+      <div *ngIf="!cargandoCitaciones && !errorCitaciones" [class.citaciones-amplias]="citaciones.length > 1">
         <div *ngIf="citaciones.length === 0" class="estado">
-          <ion-icon name="mail-outline"></ion-icon>
+          <img src="assets/illustrations/citaciones.svg" width="96" height="72" alt="">
           <p>Estás al día.</p>
           <p class="ayuda">Cuando tu coach te cite a un partido, lo verás aquí.</p>
         </div>
 
-        <ion-card *ngFor="let cit of citaciones; let i = index" [style.--i]="i" [style.view-transition-name]="'cit-' + cit.id_citacion">
+        <ion-card *ngFor="let cit of citaciones" [style.view-transition-name]="'cit-' + cit.id_citacion">
           <ion-card-header>
             <ion-card-subtitle>{{ cit.liga }}</ion-card-subtitle>
             <ion-card-title><span class="vs">vs</span> {{ cit.equipo_rival }}</ion-card-title>
@@ -126,7 +129,7 @@
         <ion-button (click)="cargarPerfil()" fill="outline">Reintentar</ion-button>
       </div>
 
-      <div *ngIf="!cargandoPerfil && !errorPerfil && perfil">
+      <div *ngIf="!cargandoPerfil && !errorPerfil && perfil" class="perfil-amplio">
         <ion-card>
           <ion-card-header>
             <ion-card-title>{{ perfil.nombre_completo }}</ion-card-title>
@@ -145,67 +148,69 @@
           </ion-card-content>
         </ion-card>
 
-        <div class="seccion-titulo">
-          <h2>Horarios bloqueados</h2>
-          <ion-button fill="clear" class="tactil" aria-label="Agregar bloqueo" (click)="mostrarFormulario()" *ngIf="!mostrandoFormulario">
-            <ion-icon name="add-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-        </div>
-
-        <ion-card *ngIf="mostrandoFormulario" class="formulario">
-          <ion-card-content>
-            <ion-item>
-              <ion-select label="Día" placeholder="Seleccionar" [(ngModel)]="nuevoBloqueo.dia_semana">
-                <ion-select-option value="Lunes">Lunes</ion-select-option>
-                <ion-select-option value="Martes">Martes</ion-select-option>
-                <ion-select-option value="Miércoles">Miércoles</ion-select-option>
-                <ion-select-option value="Jueves">Jueves</ion-select-option>
-                <ion-select-option value="Viernes">Viernes</ion-select-option>
-                <ion-select-option value="Sábado">Sábado</ion-select-option>
-                <ion-select-option value="Domingo">Domingo</ion-select-option>
-              </ion-select>
-            </ion-item>
-            <ion-item>
-              <ion-input label="Desde" type="time" [(ngModel)]="nuevoBloqueo.hora_inicio"></ion-input>
-            </ion-item>
-            <ion-item>
-              <ion-input label="Hasta" type="time" [(ngModel)]="nuevoBloqueo.hora_fin"></ion-input>
-            </ion-item>
-            <div class="acciones">
-              <ion-button fill="outline" color="medium" (click)="cancelarFormulario()">Cancelar</ion-button>
-              <ion-button (click)="guardarBloqueo()" [disabled]="guardandoBloqueo">
-                <ion-spinner name="dots" *ngIf="guardandoBloqueo"></ion-spinner>
-                <span *ngIf="!guardandoBloqueo">Guardar</span>
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
-
-        <ion-list *ngIf="perfil.horarios_bloqueados.length > 0" lines="full">
-          <ion-item *ngFor="let h of perfil.horarios_bloqueados">
-            <ion-label>{{ h.dia_semana }}</ion-label>
-            <ion-label slot="end" class="hora">{{ h.hora_inicio.slice(0, 5) }} - {{ h.hora_fin.slice(0, 5) }}</ion-label>
-            <ion-button slot="end" fill="clear" color="danger" class="tactil" aria-label="Eliminar bloqueo" (click)="eliminarBloqueo(h.id)">
-              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        <section class="bloqueos" aria-labelledby="titulo-bloqueos">
+          <div class="seccion-titulo">
+            <h2 id="titulo-bloqueos">Horarios bloqueados</h2>
+            <ion-button fill="clear" class="tactil" aria-label="Agregar bloqueo" (click)="mostrarFormulario()" *ngIf="!mostrandoFormulario">
+              <ion-icon name="add-outline" slot="icon-only"></ion-icon>
             </ion-button>
-          </ion-item>
-        </ion-list>
+          </div>
 
-        <div *ngIf="perfil.horarios_bloqueados.length === 0 && !mostrandoFormulario" class="estado">
-          <ion-icon name="time-outline"></ion-icon>
-          <p>No tienes horarios bloqueados.</p>
-          <p class="ayuda">Marca cuándo no puedes jugar y tu coach no te citará en ese horario.</p>
-          <ion-button fill="outline" (click)="mostrarFormulario()">Agregar bloqueo</ion-button>
-        </div>
+          <ion-card *ngIf="mostrandoFormulario" class="formulario">
+            <ion-card-content>
+              <ion-item>
+                <ion-select label="Día" placeholder="Seleccionar" [(ngModel)]="nuevoBloqueo.dia_semana">
+                  <ion-select-option value="Lunes">Lunes</ion-select-option>
+                  <ion-select-option value="Martes">Martes</ion-select-option>
+                  <ion-select-option value="Miércoles">Miércoles</ion-select-option>
+                  <ion-select-option value="Jueves">Jueves</ion-select-option>
+                  <ion-select-option value="Viernes">Viernes</ion-select-option>
+                  <ion-select-option value="Sábado">Sábado</ion-select-option>
+                  <ion-select-option value="Domingo">Domingo</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <ion-input label="Desde" type="time" [(ngModel)]="nuevoBloqueo.hora_inicio"></ion-input>
+              </ion-item>
+              <ion-item>
+                <ion-input label="Hasta" type="time" [(ngModel)]="nuevoBloqueo.hora_fin"></ion-input>
+              </ion-item>
+              <div class="acciones">
+                <ion-button fill="outline" color="medium" (click)="cancelarFormulario()">Cancelar</ion-button>
+                <ion-button (click)="guardarBloqueo()" [disabled]="guardandoBloqueo">
+                  <ion-spinner name="dots" *ngIf="guardandoBloqueo"></ion-spinner>
+                  <span *ngIf="!guardandoBloqueo">Guardar</span>
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <ion-list *ngIf="perfil.horarios_bloqueados.length > 0" lines="full">
+            <ion-item *ngFor="let h of perfil.horarios_bloqueados">
+              <ion-label>{{ h.dia_semana }}</ion-label>
+              <ion-label slot="end" class="hora">{{ h.hora_inicio.slice(0, 5) }} - {{ h.hora_fin.slice(0, 5) }}</ion-label>
+              <ion-button slot="end" fill="clear" color="danger" class="tactil" aria-label="Eliminar bloqueo" (click)="eliminarBloqueo(h.id)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+
+          <div *ngIf="perfil.horarios_bloqueados.length === 0 && !mostrandoFormulario" class="estado">
+            <img src="assets/illustrations/bloqueos.svg" width="96" height="72" alt="">
+            <p>No tienes horarios bloqueados.</p>
+            <p class="ayuda">Marca cuándo no puedes jugar y tu coach no te citará en ese horario.</p>
+            <ion-button fill="outline" (click)="mostrarFormulario()">Agregar bloqueo</ion-button>
+          </div>
+        </section>
       </div>
     </div>
 
-  </div>
+  </main>
 </ion-content>
 
-<ion-footer>
+<ion-footer class="ion-no-border">
   <div class="tab-indicador" aria-hidden="true" [style.--tab]="indicePestana"></div>
-  <ion-tab-bar slot="bottom">
+  <ion-tab-bar slot="bottom" aria-label="Navegación principal">
     <ion-tab-button class="tab-agenda" (click)="cambiarPestana('agenda')" [selected]="pestanaActiva === 'agenda'">
       <ion-icon name="calendar-outline"></ion-icon>
       <ion-label>Agenda</ion-label>

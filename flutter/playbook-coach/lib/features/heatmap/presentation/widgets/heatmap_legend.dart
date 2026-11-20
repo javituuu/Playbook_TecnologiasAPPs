@@ -21,14 +21,14 @@ class HeatmapLegend extends StatelessWidget {
       spacing: 6,
       runSpacing: 6,
       children: <Widget>[
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(right: 4),
           child: Text(
             'Disponibilidad:',
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w500,
-              color: PlaybookTheme.coolSteel,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),

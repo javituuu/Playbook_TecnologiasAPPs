@@ -5,7 +5,7 @@ import '../../domain/bloque_disponibilidad.dart';
 import '../../domain/matriz_disponibilidad.dart';
 
 /// Matriz interactiva `15:00–22:00` × `Lunes–Domingo` con resaltado de selección.
-class HeatmapGrid extends StatelessWidget {
+class HeatmapGrid extends StatefulWidget {
   const HeatmapGrid({
     super.key,
     required this.matriz,
@@ -20,14 +20,33 @@ class HeatmapGrid extends StatelessWidget {
   final bool Function(BloqueDisponibilidad block)? isSlotScheduled;
 
   @override
+  State<HeatmapGrid> createState() => _HeatmapGridState();
+}
+
+class _HeatmapGridState extends State<HeatmapGrid> {
+  final _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final heatmapTheme = Theme.of(context).extension<PlaybookHeatmapTheme>() ??
+    final colors = Theme.of(context).colorScheme;
+    final heatmapTheme =
+        Theme.of(context).extension<PlaybookHeatmapTheme>() ??
         PlaybookHeatmapTheme.standard;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final needsHorizontalScroll = constraints.maxWidth < 560;
-        final gridWidth = needsHorizontalScroll ? 580.0 : constraints.maxWidth;
+        final textScaler = MediaQuery.textScalerOf(context);
+        final minWidth =
+            560.0 + (textScaler.scale(14) - 14).clamp(0, double.infinity) * 20;
+        final gridWidth = constraints.maxWidth < minWidth
+            ? minWidth
+            : constraints.maxWidth;
 
         final tableContent = SizedBox(
           width: gridWidth,
@@ -35,22 +54,22 @@ class HeatmapGrid extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: PlaybookColors.surface,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: PlaybookColors.border),
+                border: Border.all(color: colors.outlineVariant),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  _buildHeaderRow(),
+                  _buildHeaderRow(context),
                   const Divider(height: 1),
-                  for (var r = 0; r < matriz.horas.length; r++) ...<Widget>[
+                  for (var r = 0; r < widget.matriz.horas.length; r++) ...<Widget>[
                     _buildHourRow(
-                      hora: matriz.horas[r],
+                      context,
+                      hora: widget.matriz.horas[r],
                       heatmapTheme: heatmapTheme,
                     ),
-                    if (r < matriz.horas.length - 1)
-                      const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                    if (r < widget.matriz.horas.length - 1) const Divider(height: 1),
                   ],
                 ],
               ),
@@ -58,48 +77,55 @@ class HeatmapGrid extends StatelessWidget {
           ),
         );
 
-        if (!needsHorizontalScroll) {
+        if (gridWidth == constraints.maxWidth) {
           return tableContent;
         }
 
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: tableContent,
+        return Scrollbar(
+          controller: _scrollController,
+          thumbVisibility: true,
+          scrollbarOrientation: ScrollbarOrientation.top,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            padding: const EdgeInsets.only(top: 12),
+            scrollDirection: Axis.horizontal,
+            child: tableContent,
+          ),
         );
       },
     );
   }
 
-  Widget _buildHeaderRow() {
+  Widget _buildHeaderRow(BuildContext context) {
     return Container(
-      color: PlaybookColors.surface,
+      color: Theme.of(context).colorScheme.surfaceContainer,
       padding: const EdgeInsets.symmetric(vertical: 11),
       child: Row(
         children: <Widget>[
-          const SizedBox(
-            width: 68,
+          SizedBox(
+            width: MediaQuery.textScalerOf(context).scale(13) * 5.25,
             child: Center(
               child: Text(
                 'HORA',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: PlaybookTheme.coolSteel,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   letterSpacing: 0.6,
                 ),
               ),
             ),
           ),
-          for (final dia in matriz.dias)
+          for (final dia in widget.matriz.dias)
             Expanded(
               child: Center(
                 child: Text(
                   dia,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
-                    color: PlaybookTheme.carbon,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -109,31 +135,39 @@ class HeatmapGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildHourRow({
+  Widget _buildHourRow(
+    BuildContext context, {
     required String hora,
     required PlaybookHeatmapTheme heatmapTheme,
   }) {
     return SizedBox(
-      height: 50,
+      height:
+          50 +
+          (MediaQuery.textScalerOf(context).scale(14) - 14).clamp(
+            0,
+            double.infinity,
+          ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
-            width: 68,
+            width: MediaQuery.textScalerOf(context).scale(13) * 5.25,
             child: Center(
               child: Text(
                 hora,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.5,
+                  fontFeatures: const [FontFeature.tabularFigures()],
                   fontWeight: FontWeight.w600,
-                  color: PlaybookTheme.carbon,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
           ),
-          for (var d = 0; d < matriz.dias.length; d++)
+          for (var d = 0; d < widget.matriz.dias.length; d++)
             Expanded(
               child: _buildCell(
+                context,
                 diaSemana: d + 1,
                 hora: hora,
                 heatmapTheme: heatmapTheme,
@@ -144,52 +178,49 @@ class HeatmapGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildCell({
+  Widget _buildCell(
+    BuildContext context, {
     required int diaSemana,
     required String hora,
     required PlaybookHeatmapTheme heatmapTheme,
   }) {
-    final block = matriz.bloqueAt(diaSemana, hora);
+    final block = widget.matriz.bloqueAt(diaSemana, hora);
     if (block == null) {
-      return const ColoredBox(color: PlaybookColors.surfaceMuted);
+      return ColoredBox(color: Theme.of(context).colorScheme.surfaceContainer);
     }
 
     final tone = heatmapTheme.forAvailability(
       block.disponiblesCount,
       total: block.totalJugadores,
     );
-    final isSelected = selectedBlock?.id == block.id;
-    final scheduled = isSlotScheduled?.call(block) ?? false;
+    final isSelected = widget.selectedBlock?.id == block.id;
+    final scheduled = widget.isSlotScheduled?.call(block) ?? false;
 
     return Material(
       color: tone.background,
       child: InkWell(
         key: Key('heatmap_cell_${block.diaSemana}_${block.hora}'),
-        onTap: () => onSelectBlock(block),
+        onTap: () => widget.onSelectBlock(block),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 140),
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 140),
           decoration: BoxDecoration(
             border: isSelected
-                ? Border.all(color: const Color(0xFF2563EB), width: 2.5)
-                : Border.all(color: Colors.white.withValues(alpha: 0.35)),
-            boxShadow: isSelected
-                ? const <BoxShadow>[
-                    BoxShadow(
-                      color: Color(0x332563EB),
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
-                    ),
-                  ]
-                : null,
+                ? Border.all(color: tone.foreground, width: 2.5)
+                : Border.all(color: tone.border),
           ),
           child: Stack(
             children: <Widget>[
               Center(
                 child: Text(
                   block.ratioLabel,
+                  semanticsLabel:
+                      '${block.tituloDetalle}, ${block.ratioLabel} disponibles',
                   style: TextStyle(
                     color: tone.foreground,
                     fontSize: 13.5,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -203,13 +234,13 @@ class HeatmapGrid extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
-                        color: PlaybookTheme.dustyGrape,
+                        color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.event_available_rounded,
                         size: 11,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ),

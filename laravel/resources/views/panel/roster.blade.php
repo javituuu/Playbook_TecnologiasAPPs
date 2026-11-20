@@ -466,8 +466,8 @@
                 $horasMatriz = $diasSemana !== [] ? array_keys($grillaDisponibilidad['grilla'][$diasSemana[0]]) : [];
             @endphp
 
-            <div class="tabla">
-                <table class="tabla-heatmap" role="grid" aria-label="Disponibilidad semanal del equipo">
+            <div class="tabla" tabindex="0" role="region" aria-label="Matriz desplazable de disponibilidad semanal">
+                <table class="tabla-heatmap" aria-label="Disponibilidad semanal del equipo">
                     <thead>
                         <tr>
                             <th scope="col">Hora ({{ $grillaDisponibilidad['duracion_bloque_minutos'] }}m)</th>

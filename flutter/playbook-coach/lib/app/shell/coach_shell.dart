@@ -237,10 +237,14 @@ class _CoachShellState extends State<CoachShell> {
 
         return LayoutBuilder(
           builder: (context, constraints) {
-            final isWide = constraints.maxWidth >= CoachShell.tabletBreakpoint;
+            final isWide =
+                constraints.maxWidth >= CoachShell.tabletBreakpoint ||
+                (constraints.maxWidth >= 560 && constraints.maxHeight < 440);
             final isExtended =
                 constraints.maxWidth >= CoachShell.desktopExtendedBreakpoint;
 
+            final useShortLabels =
+                constraints.maxWidth < MediaQuery.textScalerOf(context).scale(12) * 30;
             final bodyContent = IndexedStack(
               index: _selectedIndex,
               children: <Widget>[
@@ -296,23 +300,7 @@ class _CoachShellState extends State<CoachShell> {
                               extended: isExtended,
                               minWidth: 76,
                               minExtendedWidth: 210,
-                              backgroundColor: PlaybookColors.surface,
-                              indicatorColor: PlaybookTheme.pearlAqua
-                                  .withValues(alpha: 0.35),
-                              selectedIconTheme: const IconThemeData(
-                                color: PlaybookTheme.dustyGrape,
-                              ),
-                              unselectedIconTheme: const IconThemeData(
-                                color: PlaybookTheme.coolSteel,
-                              ),
-                              selectedLabelTextStyle: const TextStyle(
-                                color: PlaybookTheme.carbon,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              unselectedLabelTextStyle: const TextStyle(
-                                color: PlaybookTheme.coolSteel,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              scrollable: true,
                               onDestinationSelected: (index) {
                                 setState(() {
                                   _selectedIndex = index;
@@ -345,16 +333,7 @@ class _CoachShellState extends State<CoachShell> {
                   children: <Widget>[
                     PlaybookBrandMark(size: 32),
                     SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Playbook Coach',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 17,
-                        ),
-                      ),
-                    ),
+                    Expanded(child: PlaybookCoachWordmark(fontSize: 22)),
                   ],
                 ),
                 actions: <Widget>[
@@ -368,7 +347,9 @@ class _CoachShellState extends State<CoachShell> {
                   const SizedBox(width: 4),
                 ],
                 bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(82),
+                  preferredSize: Size.fromHeight(
+                    76 + MediaQuery.textScalerOf(context).scale(14) - 14,
+                  ),
                   child: _MobileSessionAndTeamBar(
                     user: user,
                     equipos: equipos,
@@ -390,7 +371,10 @@ class _CoachShellState extends State<CoachShell> {
                     NavigationDestination(
                       icon: Icon(item.icon),
                       selectedIcon: Icon(item.selectedIcon),
-                      label: item.label,
+                      label: useShortLabels && item == CoachDestination.disponibilidad
+                          ? 'Mapa'
+                          : item.label,
+                      tooltip: item.label,
                     ),
                 ],
               ),
@@ -424,7 +408,7 @@ class _WideTopHeader extends StatelessWidget {
     final showFullTitleAndLogoutLabel = availableWidth >= 840;
 
     return Material(
-      color: PlaybookColors.surface,
+      color: Theme.of(context).colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Row(
@@ -432,14 +416,7 @@ class _WideTopHeader extends StatelessWidget {
             const PlaybookBrandMark(size: 36),
             if (showFullTitleAndLogoutLabel) ...<Widget>[
               const SizedBox(width: 12),
-              const Text(
-                'Playbook Coach',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: PlaybookTheme.carbon,
-                ),
-              ),
+              const PlaybookCoachWordmark(fontSize: 24),
             ],
             const SizedBox(width: 14),
             ConstrainedBox(
@@ -468,7 +445,7 @@ class _WideTopHeader extends StatelessWidget {
                 key: const Key('logout_button'),
                 onPressed: onLogout,
                 style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, 40),
+                  minimumSize: const Size(0, 48),
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                 ),
                 icon: const Icon(Icons.logout_rounded, size: 18),
@@ -503,14 +480,13 @@ class _MobileSessionAndTeamBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-      decoration: const BoxDecoration(
-        color: PlaybookColors.surface,
-        border: Border(
-          bottom: BorderSide(color: PlaybookColors.border),
-        ),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(bottom: BorderSide(color: colors.outlineVariant)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -544,20 +520,18 @@ class _TeamSelectorDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     if (equipos.isEmpty) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: PlaybookColors.surfaceMuted,
+          color: colors.surfaceContainer,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: PlaybookColors.border),
+          border: Border.all(color: colors.outlineVariant),
         ),
-        child: const Text(
+        child: Text(
           'Sin equipos asignados',
-          style: TextStyle(
-            color: PlaybookTheme.coolSteel,
-            fontSize: 13,
-          ),
+          style: TextStyle(color: colors.onSurfaceVariant, fontSize: 13),
         ),
       );
     }
@@ -566,10 +540,11 @@ class _TeamSelectorDropdown extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
+      constraints: const BoxConstraints(minHeight: 48),
       decoration: BoxDecoration(
-        color: PlaybookColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: PlaybookColors.border),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int>(
@@ -578,12 +553,9 @@ class _TeamSelectorDropdown extends StatelessWidget {
           isExpanded: isExpanded,
           isDense: true,
           borderRadius: BorderRadius.circular(12),
-          icon: const Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: PlaybookTheme.dustyGrape,
-          ),
-          style: const TextStyle(
-            color: PlaybookTheme.carbon,
+          icon: Icon(Icons.keyboard_arrow_down_rounded, color: colors.primary),
+          style: TextStyle(
+            color: colors.onSurface,
             fontWeight: FontWeight.w600,
             fontSize: 13.5,
           ),
@@ -635,8 +607,8 @@ class _ActiveSessionBadge extends StatelessWidget {
           child: Text(
             'Sesión activa: ${user.name}',
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: PlaybookTheme.dustyGrape,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
               fontSize: 13,
               fontWeight: FontWeight.w500,
             ),
@@ -658,10 +630,11 @@ class _CoachAvatarBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return CircleAvatar(
       radius: radius,
-      backgroundColor: PlaybookTheme.dustyGrape,
-      foregroundColor: Colors.white,
+      backgroundColor: colors.primary,
+      foregroundColor: colors.onPrimary,
       child: Text(
         user.initials,
         style: TextStyle(

@@ -51,6 +51,18 @@ ion-title, h1, h2, ion-card-title {
   letter-spacing: -0.01em;
 }
 
+ion-button {
+  min-height: 44px;
+  --border-radius: 10px;
+  --box-shadow: none;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+ion-button::part(native) {
+  white-space: normal;
+}
+
 /* Foco visible */
 .ion-focused, :focus-visible {
   outline: 2px solid var(--ion-color-primary);

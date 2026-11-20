@@ -7,6 +7,7 @@
     <title>@yield('titulo') · Playbook</title>
     <link rel="preload" href="{{ asset('fonts/inter/inter-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ asset('fonts/space-grotesk/space-grotesk-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/playbook-mark.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/panel.css') }}?v={{ filemtime(public_path('css/panel.css')) }}">
 </head>
 <body>
@@ -16,7 +17,8 @@
         <aside class="lateral">
             <header class="lateral__cabecera">
                 <a class="marca" href="{{ route('fixture') }}">
-                    <span>Playbook</span>
+                    <img src="{{ asset('images/playbook-mark.svg') }}" width="32" height="32" alt="">
+                    <span>Play<span class="marca__ligera">book</span></span>
                 </a>
             </header>
 

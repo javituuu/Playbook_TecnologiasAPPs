@@ -116,29 +116,26 @@ class NominaScreen extends StatelessWidget {
                                                     initialSuplenteId:
                                                         suplenteId,
                                                   ),
-                                                  onCambiarEstado: (
-                                                    eventoId,
-                                                    jugadorId,
-                                                    estado,
-                                                  ) =>
-                                                      controller
-                                                          .actualizarEstadoCitacion(
-                                                    eventoId: eventoId,
-                                                    jugadorId: jugadorId,
-                                                    estado: estado,
-                                                  ),
-                                                ),
+                                          onCambiarEstado:
+                                              (eventoId, jugadorId, estado) =>
+                                                  controller
+                                                      .actualizarEstadoCitacion(
+                                                        eventoId: eventoId,
+                                                        jugadorId: jugadorId,
+                                                        estado: estado,
+                                                      ),
                                         ),
-                                      ],
-                                    )
-                                  : _EventosList(
-                                      eventos: eventos,
-                                      selectedEventoId: selectedEvento?.id,
-                                      onSelectEvento: (evento) {
-                                        controller.selectEvento(evento.id);
-                                        _openDetailBottomSheet(context, evento);
-                                      },
-                                    ),
+                                ),
+                              ],
+                            )
+                          : _EventosList(
+                              eventos: eventos,
+                              selectedEventoId: selectedEvento?.id,
+                              onSelectEvento: (evento) {
+                                controller.selectEvento(evento.id);
+                                _openDetailBottomSheet(context, evento);
+                              },
+                            ),
                     ),
                   ],
                 ),
@@ -369,7 +366,7 @@ class _EventoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
           color: selected
-              ? PlaybookColors.dustyGrape
+              ? theme.colorScheme.primary
               : theme.colorScheme.outlineVariant,
           width: selected ? 1.6 : 1,
         ),
@@ -395,7 +392,7 @@ class _EventoCard extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isPartido
-                          ? PlaybookColors.dustyGrape.withValues(alpha: 0.14)
+                          ? theme.colorScheme.primary.withValues(alpha: 0.14)
                           : PlaybookColors.pearlAqua.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(999),
                     ),
@@ -404,8 +401,8 @@ class _EventoCard extends StatelessWidget {
                       style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: isPartido
-                            ? PlaybookColors.dustyGrape
-                            : PlaybookColors.carbon,
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -468,13 +465,15 @@ class _EventoCard extends StatelessWidget {
                 children: <Widget>[
                   _CountPill(
                     label: '${evento.confirmadosCount} confirmados',
-                    color: PlaybookColors.pearlAqua.withValues(alpha: 0.25),
-                    textColor: PlaybookColors.carbon,
+                    color: PlaybookTheme.success(theme.colorScheme)
+                        .withValues(alpha: 0.12),
+                    textColor: PlaybookTheme.success(theme.colorScheme),
                   ),
                   _CountPill(
                     label: '${evento.pendientesCount} pendientes',
-                    color: PlaybookColors.coolSteel.withValues(alpha: 0.22),
-                    textColor: PlaybookColors.dustyGrape,
+                    color: PlaybookTheme.warning(theme.colorScheme)
+                        .withValues(alpha: 0.10),
+                    textColor: PlaybookTheme.warning(theme.colorScheme),
                   ),
                   if (evento.rechazadosCount > 0)
                     _CountPill(
@@ -751,14 +750,14 @@ class _CitacionRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: PlaybookColors.dustyGrape.withValues(alpha: 0.12),
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               jugador.posicion,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: PlaybookColors.dustyGrape,
+                color: theme.colorScheme.primary,
               ),
             ),
           ),
@@ -856,15 +855,15 @@ class _EstadoCitacionChip extends StatelessWidget {
     final theme = Theme.of(context);
     final (bg, fg, icon) = switch (estado) {
       EstadoCitacion.confirmado => (
-          PlaybookColors.pearlAqua.withValues(alpha: 0.25),
-          PlaybookColors.carbon,
-          Icons.check_circle_outline_rounded,
-        ),
+        PlaybookTheme.success(theme.colorScheme).withValues(alpha: 0.12),
+        PlaybookTheme.success(theme.colorScheme),
+        Icons.check_circle_outline_rounded,
+      ),
       EstadoCitacion.pendiente => (
-          PlaybookColors.coolSteel.withValues(alpha: 0.22),
-          PlaybookColors.dustyGrape,
-          Icons.schedule_rounded,
-        ),
+        PlaybookTheme.warning(theme.colorScheme).withValues(alpha: 0.10),
+        PlaybookTheme.warning(theme.colorScheme),
+        Icons.schedule_rounded,
+      ),
       EstadoCitacion.rechazado => (
           theme.colorScheme.error.withValues(alpha: 0.14),
           theme.colorScheme.error,

@@ -46,6 +46,7 @@ class _PracticasScreenState extends State<PracticasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return ListenableBuilder(
       listenable: widget.controller,
       builder: (context, _) {
@@ -75,22 +76,18 @@ class _PracticasScreenState extends State<PracticasScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      const Text(
+                      Text(
                         'Prácticas Programadas',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: PlaybookTheme.carbon,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const SizedBox(height: 2),
                       Text(
                         widget.equipo != null
                             ? '${widget.equipo!.displayName} · ${controller.programadas.length} activas, ${controller.canceladas.length} canceladas'
                             : 'Selecciona un equipo para gestionar sus prácticas',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13.5,
-                          color: PlaybookTheme.coolSteel,
+                          color: colors.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -169,27 +166,27 @@ class _PracticasScreenState extends State<PracticasScreen> {
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       children: <Widget>[
-                        const Icon(
+                        Icon(
                           Icons.event_busy_outlined,
                           size: 40,
-                          color: PlaybookTheme.coolSteel,
+                          color: colors.onSurfaceVariant,
                         ),
                         const SizedBox(height: 10),
-                        const Text(
+                        Text(
                           'No hay prácticas en esta vista.',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: PlaybookTheme.carbon,
+                            color: colors.onSurface,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'Selecciona un bloque con quórum (>= 4/5) en el heatmap para agendar una nueva práctica.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            color: PlaybookTheme.coolSteel,
+                            color: colors.onSurfaceVariant,
                           ),
                         ),
                         if (widget.onOpenHeatmap != null) ...<Widget>[
@@ -236,6 +233,7 @@ class _PracticaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final isProgramada = practica.estaProgramada;
     final statusColor = isProgramada
         ? PlaybookTheme.heatmap5.foreground
@@ -285,13 +283,13 @@ class _PracticaCard extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: PlaybookColors.surfaceMuted,
+                        color: colors.surfaceContainer,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         practica.serie.label,
-                        style: const TextStyle(
-                          color: PlaybookTheme.dustyGrape,
+                        style: TextStyle(
+                          color: colors.primary,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                         ),
@@ -299,9 +297,9 @@ class _PracticaCard extends StatelessWidget {
                     ),
                     Text(
                       practica.semanaIso,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11.5,
-                        color: PlaybookTheme.coolSteel,
+                        color: colors.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -310,19 +308,19 @@ class _PracticaCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'vs ${practica.rival}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: PlaybookTheme.carbon,
+                    color: colors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   '${practica.horarioResumen} · ${WeekUtils.formatShortDate(practica.fecha)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: PlaybookTheme.dustyGrape,
+                    color: colors.primary,
                   ),
                 ),
               ],
@@ -334,7 +332,7 @@ class _PracticaCard extends StatelessWidget {
                     key: Key('cancelar_practica_${practica.id}'),
                     onPressed: isSubmitting ? null : onCancelar,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: PlaybookColors.error,
+                      foregroundColor: colors.error,
                       side: const BorderSide(color: Color(0xFFFECACA)),
                       minimumSize: const Size(0, 38),
                       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -382,10 +380,7 @@ class _PracticaCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     practica.notas!,
-                    style: const TextStyle(
-                      fontSize: 12.5,
-                      color: PlaybookTheme.coolSteel,
-                    ),
+                    style: TextStyle(fontSize: 12.5, color: colors.onSurfaceVariant),
                   ),
                 ],
                 if (practica.estaCancelada &&
@@ -438,19 +433,17 @@ class _MetaItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Icon(icon, size: 15, color: PlaybookTheme.coolSteel),
+        Icon(icon, size: 15, color: colors.onSurfaceVariant),
         const SizedBox(width: 5),
         Flexible(
           child: Text(
             text,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 12.5,
-              color: PlaybookTheme.carbon,
-            ),
+            style: TextStyle(fontSize: 12.5, color: colors.onSurface),
           ),
         ),
       ],

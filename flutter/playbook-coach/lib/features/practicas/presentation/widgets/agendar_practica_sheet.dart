@@ -30,7 +30,7 @@ Future<Practica?> showAgendarPracticaSheet({
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 560),
           child: Material(
-            color: PlaybookColors.surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             clipBehavior: Clip.antiAlias,
             child: AgendarPracticaSheet(
@@ -135,6 +135,7 @@ class _AgendarPracticaSheetState extends State<AgendarPracticaSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final endTime = _selectedSerie.computeEndTime(widget.bloque.hora);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
@@ -158,7 +159,7 @@ class _AgendarPracticaSheetState extends State<AgendarPracticaSheet> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: PlaybookColors.border,
+                        color: colors.outlineVariant,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -170,20 +171,20 @@ class _AgendarPracticaSheetState extends State<AgendarPracticaSheet> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            const Text(
+                            Text(
                               'Agendar práctica',
                               style: TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w800,
-                                color: PlaybookTheme.carbon,
+                                color: colors.onSurface,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               '${widget.equipo.displayName} · ${widget.bloque.diaNombre} ${WeekUtils.formatShortDate(widget.bloque.fecha)} (${widget.bloque.hora} – $endTime)',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12.5,
-                                color: PlaybookTheme.dustyGrape,
+                                color: colors.primary,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -200,12 +201,12 @@ class _AgendarPracticaSheetState extends State<AgendarPracticaSheet> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Serie / Duración',
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
-                      color: PlaybookTheme.carbon,
+                      color: colors.onSurface,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -319,10 +320,7 @@ class _AgendarPracticaSheetState extends State<AgendarPracticaSheet> {
                           .join(', '),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: PlaybookTheme.coolSteel,
-                      ),
+                      style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
                     ),
                   ),
                   if (errorMessage != null) ...<Widget>[
@@ -364,12 +362,12 @@ class _AgendarPracticaSheetState extends State<AgendarPracticaSheet> {
                           key: const Key('confirmar_practica_button'),
                           onPressed: isSubmitting ? null : _submit,
                           child: isSubmitting
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    color: colors.onPrimary,
                                   ),
                                 )
                               : const Text('Confirmar práctica'),

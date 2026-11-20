@@ -17,7 +17,7 @@ import 'widgets/quorum_threshold_banner.dart';
 
 /// Pantalla principal de la Matriz de Disponibilidad Semanal y Detalle del Bloque.
 ///
-/// En pantallas anchas (`>= 900px`) muestra la matriz y el panel derecho lado a lado,
+/// En pantallas anchas (`>= 1000px`) muestra la matriz y el panel derecho lado a lado,
 /// fiel a `flutter-coach-heatmap.png`. En móvil muestra un panel resumen inferior
 /// y abre el detalle completo en una hoja modal inferior.
 class HeatmapScreen extends StatelessWidget {
@@ -29,7 +29,7 @@ class HeatmapScreen extends StatelessWidget {
     this.onOpenPracticas,
   });
 
-  static const double splitLayoutBreakpoint = 900;
+  static const double splitLayoutBreakpoint = 1000;
 
   final HeatmapController heatmapController;
   final PracticasController practicasController;
@@ -97,7 +97,7 @@ class HeatmapScreen extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: PlaybookColors.surface,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -140,6 +140,7 @@ class HeatmapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return ListenableBuilder(
       listenable: Listenable.merge(
         <Listenable>[heatmapController, practicasController],
@@ -163,18 +164,14 @@ class HeatmapScreen extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      const Icon(
-                        Icons.cloud_off_rounded,
-                        size: 36,
-                        color: PlaybookColors.error,
-                      ),
+                      Icon(Icons.cloud_off_rounded, size: 36, color: colors.error),
                       const SizedBox(height: 10),
                       Text(
                         heatmapController.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          color: PlaybookTheme.carbon,
+                          color: colors.onSurface,
                         ),
                       ),
                       const SizedBox(height: 14),
@@ -195,8 +192,26 @@ class HeatmapScreen extends StatelessWidget {
         }
 
         if (matriz == null) {
-          return const Center(
-            child: Text('No hay datos de disponibilidad para mostrar.'),
+          return Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/brand/disponibilidad-vacia.png',
+                    width: 112,
+                    height: 84,
+                    excludeFromSemantics: true,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'No hay datos de disponibilidad para mostrar.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
           );
         }
 
@@ -214,19 +229,31 @@ class HeatmapScreen extends StatelessWidget {
             final isSplit =
                 constraints.maxWidth >= HeatmapScreen.splitLayoutBreakpoint;
 
+            final compact = constraints.maxWidth < 580;
+            final pinSummary = constraints.maxHeight >= 400;
+            final summary = selectedBlock == null
+                ? null
+                : _MobileBottomSummaryBar(
+                    bloque: selectedBlock,
+                    onOpenDetail: () =>
+                        _openMobileDetailSheet(context, selectedBlock),
+                    onAgendar: selectedBlock.cumpleQuorum
+                        ? () => _openAgendarSheet(context, selectedBlock)
+                        : null,
+                  );
             final matrixSection = SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(compact ? 12 : 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  _HeatmapHeader(matriz: matriz),
-                  const SizedBox(height: 14),
+                  _HeatmapHeader(matriz: matriz, showLegend: !compact),
+                  SizedBox(height: compact ? 8 : 16),
                   _ControlsToolbar(
                     controller: heatmapController,
                     scheduledCount: practicasController.programadas.length,
                     onOpenPracticas: onOpenPracticas,
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: compact ? 8 : 16),
                   HeatmapGrid(
                     matriz: matriz,
                     selectedBlock: selectedBlock,
@@ -246,11 +273,19 @@ class HeatmapScreen extends StatelessWidget {
                       }
                     },
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
+                  if (compact) ...[
+                    HeatmapLegend(totalJugadores: matriz.totalJugadores),
+                    const SizedBox(height: 12),
+                  ],
                   QuorumThresholdBanner(
                     quorumMinimo: matriz.quorumMinimo,
                     totalJugadores: matriz.totalJugadores,
                   ),
+                  if (!isSplit && !pinSummary && summary != null) ...[
+                    const SizedBox(height: 12),
+                    summary,
+                  ],
                 ],
               ),
             );
@@ -264,7 +299,7 @@ class HeatmapScreen extends StatelessWidget {
                   SizedBox(
                     width: 350,
                     child: Material(
-                      color: PlaybookColors.surface,
+                      color: colors.surface,
                       child: selectedBlock == null
                           ? const Center(
                               child: Text('Selecciona un bloque horario.'),
@@ -287,19 +322,12 @@ class HeatmapScreen extends StatelessWidget {
               );
             }
 
+            if (!pinSummary || summary == null) return matrixSection;
+
             return Column(
-              children: <Widget>[
+              children: [
                 Expanded(child: matrixSection),
-                if (selectedBlock != null)
-                  _MobileBottomSummaryBar(
-                    bloque: selectedBlock,
-                    serie: heatmapController.selectedSerie,
-                    onOpenDetail: () =>
-                        _openMobileDetailSheet(context, selectedBlock),
-                    onAgendar: selectedBlock.cumpleQuorum
-                        ? () => _openAgendarSheet(context, selectedBlock)
-                        : null,
-                  ),
+                summary,
               ],
             );
           },
@@ -310,14 +338,14 @@ class HeatmapScreen extends StatelessWidget {
 }
 
 class _HeatmapHeader extends StatelessWidget {
-  const _HeatmapHeader({
-    required this.matriz,
-  });
+  const _HeatmapHeader({required this.matriz, required this.showLegend});
 
   final MatrizDisponibilidad matriz;
+  final bool showLegend;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Wrap(
       alignment: WrapAlignment.spaceBetween,
       crossAxisAlignment: WrapCrossAlignment.end,
@@ -327,25 +355,23 @@ class _HeatmapHeader extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Text(
+            Text(
               'Matriz de Disponibilidad Semanal',
               style: TextStyle(
-                fontSize: 22,
+                fontFamily: 'League Spartan',
+                fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: PlaybookTheme.carbon,
+                color: colors.onSurface,
               ),
             ),
             const SizedBox(height: 2),
             Text(
-              'Planificación de quórum de entrenamientos (Mínimo: ${matriz.quorumMinimo} jugadores)',
-              style: const TextStyle(
-                fontSize: 13.5,
-                color: PlaybookTheme.coolSteel,
-              ),
+              'Quórum mínimo para práctica: ${matriz.quorumMinimo} jugadores',
+              style: TextStyle(fontSize: 13.5, color: colors.onSurfaceVariant),
             ),
           ],
         ),
-        HeatmapLegend(totalJugadores: matriz.totalJugadores),
+        if (showLegend) HeatmapLegend(totalJugadores: matriz.totalJugadores),
       ],
     );
   }
@@ -364,12 +390,13 @@ class _ControlsToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: PlaybookColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: PlaybookColors.border),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
@@ -383,9 +410,6 @@ class _ControlsToolbar extends StatelessWidget {
               IconButton(
                 key: const Key('week_prev_button'),
                 tooltip: 'Semana anterior',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-                visualDensity: VisualDensity.compact,
                 onPressed: controller.isLoading
                     ? null
                     : () => controller.changeWeek(-1),
@@ -399,18 +423,18 @@ class _ControlsToolbar extends StatelessWidget {
                     Text(
                       controller.semanaLabel,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
-                        color: PlaybookTheme.carbon,
+                        color: colors.onSurface,
                       ),
                     ),
                     Text(
                       controller.semanaIso,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11.5,
-                        color: PlaybookTheme.coolSteel,
+                        color: colors.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -420,9 +444,6 @@ class _ControlsToolbar extends StatelessWidget {
               IconButton(
                 key: const Key('week_next_button'),
                 tooltip: 'Semana siguiente',
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-                visualDensity: VisualDensity.compact,
                 onPressed: controller.isLoading
                     ? null
                     : () => controller.changeWeek(1),
@@ -441,12 +462,12 @@ class _ControlsToolbar extends StatelessWidget {
             spacing: 8,
             runSpacing: 6,
             children: <Widget>[
-              const Text(
+              Text(
                 'Serie:',
                 style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
-                  color: PlaybookTheme.dustyGrape,
+                  color: colors.primary,
                 ),
               ),
               for (final serie in SerieDuracion.values)
@@ -459,10 +480,10 @@ class _ControlsToolbar extends StatelessWidget {
                 ),
               if (onOpenPracticas != null)
                 ActionChip(
-                  avatar: const Icon(
+                  avatar: Icon(
                     Icons.event_available_rounded,
                     size: 16,
-                    color: PlaybookTheme.dustyGrape,
+                    color: colors.primary,
                   ),
                   label: Text('Prácticas ($scheduledCount)'),
                   onPressed: onOpenPracticas,
@@ -478,29 +499,29 @@ class _ControlsToolbar extends StatelessWidget {
 class _MobileBottomSummaryBar extends StatelessWidget {
   const _MobileBottomSummaryBar({
     required this.bloque,
-    required this.serie,
     required this.onOpenDetail,
     required this.onAgendar,
   });
 
   final BloqueDisponibilidad bloque;
-  final SerieDuracion serie;
   final VoidCallback onOpenDetail;
   final VoidCallback? onAgendar;
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final cumple = bloque.cumpleQuorum;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-      decoration: const BoxDecoration(
-        color: PlaybookColors.surface,
-        border: Border(top: BorderSide(color: PlaybookColors.border)),
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(top: BorderSide(color: colors.outlineVariant)),
       ),
       child: Row(
         children: <Widget>[
           Expanded(
+            flex: 3,
             child: InkWell(
               key: const Key('mobile_block_summary_tap'),
               onTap: onOpenDetail,
@@ -513,24 +534,22 @@ class _MobileBottomSummaryBar extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       '${bloque.tituloDetalle} · ${bloque.ratioLabel}',
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: PlaybookTheme.carbon,
+                        color: colors.onSurface,
                       ),
                     ),
                     Text(
                       cumple
-                          ? 'Quórum OK (${serie.label}) · Toca para ver detalle'
-                          : 'Sin quórum mínimo (${bloque.quorumMinimo}/${bloque.totalJugadores}) · Ver detalle',
-                      overflow: TextOverflow.ellipsis,
+                          ? 'Cumple quórum · Ver detalle'
+                          : 'Sin quórum · Ver detalle',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: cumple
-                            ? const Color(0xFF15803D)
-                            : const Color(0xFFB91C1C),
+                        color: cumple ? PlaybookTheme.success(colors) : colors.error,
                       ),
                     ),
                   ],
@@ -539,14 +558,17 @@ class _MobileBottomSummaryBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          FilledButton(
-            key: const Key('mobile_agendar_aqui_button'),
-            onPressed: onAgendar,
-            style: FilledButton.styleFrom(
-              minimumSize: const Size(0, 40),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+          Flexible(
+            flex: 2,
+            child: FilledButton(
+              key: const Key('mobile_agendar_aqui_button'),
+              onPressed: onAgendar,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 48),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+              ),
+              child: const Text('Agendar aquí', textAlign: TextAlign.center),
             ),
-            child: const Text('Agendar aquí'),
           ),
         ],
       ),

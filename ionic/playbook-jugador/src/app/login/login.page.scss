@@ -2,56 +2,81 @@
 .page-wrap {
   max-width: 480px;
   margin: 0 auto;
-  padding: max(12vh, 64px) 24px 24px;
+  padding-block: clamp(24px, 12dvh, 112px) 24px;
+  padding-inline-start: max(24px, env(safe-area-inset-left));
+  padding-inline-end: max(24px, env(safe-area-inset-right));
   position: relative;
 }
 
-// Marca P con la ranura rellena por la línea aqua; en oscuro la línea es el fondo (ranura vacía)
+// La línea del símbolo es la única animación de entrada.
 .lockup { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
-.marca-p { width: 48px; height: 48px; flex: none; position: relative; top: -5px; // alinea la P con la altura de mayúscula del wordmark
-   animation: subir 560ms var(--pb-out) both; }
+.marca-p { width: 48px; height: 48px; flex: none; transform: translateY(-3px); }
 .marca-p .p { fill: var(--ion-color-primary); }
 .marca-p .linea {
-  fill: #84DCC6;
+  fill: #84dcc6;
   transform-box: fill-box;
   transform-origin: left center;
-  animation: linea 480ms var(--pb-draw) 200ms both;
+  animation: linea 360ms var(--pb-draw);
 }
-@media (prefers-color-scheme: dark) { .marca-p .linea { fill: var(--ion-background-color); } }
-.wordmark span { display: inline-block; animation: subir 560ms var(--pb-out) both; }
-.w-play { animation-delay: 80ms; }
-.w-book { font-weight: 300; animation-delay: 160ms; }
-h1 { animation: subir 480ms var(--pb-out) 280ms both; }
-.subtitulo { animation: subir 480ms var(--pb-out) 320ms both; }
-form { animation: subir 480ms var(--pb-out) 360ms both; }
-// Las animaciones esperan a que cargue la fuente
-.page-wrap:not(.listo) :is(.marca-p, .linea, .wordmark span, h1, .subtitulo, form) { animation-play-state: paused; }
+@media (prefers-color-scheme: dark) {
+  .marca-p .linea { fill: var(--ion-background-color); }
+}
+.w-book { font-weight: 300; }
 @keyframes linea { from { transform: scaleX(0); } }
-@keyframes subir { from { opacity: 0; transform: translateY(12px); } }
+
+.ilustracion { display: none; }
+
+@media (min-width: 54rem) {
+  .page-wrap {
+    display: grid;
+    place-items: center;
+    max-width: 1120px;
+    min-height: 100%;
+    padding-block: 32px;
+  }
+
+  .acceso {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 420px);
+  }
+
+  .ilustracion {
+    display: block;
+    position: absolute;
+    inset-inline-end: 2%;
+    inset-block-start: 10%;
+    width: clamp(220px, 29vw, 370px);
+    height: auto;
+    opacity: .35;
+    pointer-events: none;
+  }
+}
 
 .wordmark {
   margin: 0;
   font-family: var(--pb-font-display);
   font-weight: 800;
-  font-size: 44px;
+  font-size: clamp(2rem, 9vw, 2.75rem);
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--ion-color-primary);
 }
 
 h1 {
-  margin: 0 0 4px;
-  font-size: 24px;
-  font-weight: 300;
+  margin: 0 0 8px;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
 }
 
 .subtitulo {
-  margin: 0 0 16px;
+  margin: 0 0 24px;
   color: var(--ion-color-step-600);
 }
 
 ion-list {
   margin-bottom: 16px;
+  border: 1px solid var(--ion-border-color);
   border-radius: 16px;
   overflow: hidden;
   background: var(--ion-card-background);

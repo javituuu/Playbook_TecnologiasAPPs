@@ -30,6 +30,7 @@ class BlockDetailPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     final cumpleQuorum = bloque.cumpleQuorum;
     final endTime = serie.computeEndTime(bloque.hora);
 
@@ -44,31 +45,31 @@ class BlockDetailPanel extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Text(
+                  Text(
                     'DETALLE DEL BLOQUE',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.7,
-                      color: PlaybookTheme.coolSteel,
+                      color: colors.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     bloque.tituloDetalle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: PlaybookTheme.carbon,
+                      color: colors.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     '${WeekUtils.formatShortDate(bloque.fecha)} · ${bloque.hora} – $endTime (${serie.label})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w500,
-                      color: PlaybookTheme.dustyGrape,
+                      color: colors.primary,
                     ),
                   ),
                 ],
@@ -96,11 +97,11 @@ class BlockDetailPanel extends StatelessWidget {
         const SizedBox(height: 18),
         Text(
           'AUSENCIAS REGISTRADAS (${bloque.ausencias.length})',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11.5,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.6,
-            color: PlaybookTheme.carbon,
+            color: colors.onSurface,
           ),
         ),
         const SizedBox(height: 8),
@@ -108,16 +109,13 @@ class BlockDetailPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: PlaybookColors.surfaceMuted,
+              color: colors.surfaceContainer,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: PlaybookColors.border),
+              border: Border.all(color: colors.outlineVariant),
             ),
-            child: const Text(
+            child: Text(
               'Sin ausencias registradas en este bloque.',
-              style: TextStyle(
-                fontSize: 12.5,
-                color: PlaybookTheme.coolSteel,
-              ),
+              style: TextStyle(fontSize: 12.5, color: colors.onSurfaceVariant),
             ),
           )
         else
@@ -128,21 +126,18 @@ class BlockDetailPanel extends StatelessWidget {
         const SizedBox(height: 18),
         Text(
           'DISPONIBLES PARA PRÁCTICA (${bloque.disponibles.length})',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11.5,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.6,
-            color: PlaybookTheme.carbon,
+            color: colors.onSurface,
           ),
         ),
         const SizedBox(height: 8),
         if (bloque.disponibles.isEmpty)
-          const Text(
+          Text(
             'Ningún jugador disponible en este horario.',
-            style: TextStyle(
-              fontSize: 12.5,
-              color: PlaybookTheme.coolSteel,
-            ),
+            style: TextStyle(fontSize: 12.5, color: colors.onSurfaceVariant),
           )
         else
           for (final jugador in bloque.disponibles)
@@ -150,28 +145,28 @@ class BlockDetailPanel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
                 children: <Widget>[
-                  const Icon(
+                  Icon(
                     Icons.check_rounded,
                     size: 17,
-                    color: Color(0xFF15803D),
+                    color: PlaybookTheme.success(colors),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       jugador.displayName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w500,
-                        color: PlaybookTheme.carbon,
+                        color: colors.onSurface,
                       ),
                     ),
                   ),
                   if (jugador.rol != null)
                     Text(
                       jugador.rol!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11.5,
-                        color: PlaybookTheme.coolSteel,
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
                 ],
@@ -182,25 +177,25 @@ class BlockDetailPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: PlaybookColors.surfaceMuted,
+              color: colors.surfaceContainer,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: PlaybookColors.border),
+              border: Border.all(color: colors.outlineVariant),
             ),
             child: Row(
               children: <Widget>[
-                const Icon(
+                Icon(
                   Icons.lock_outline_rounded,
                   size: 16,
-                  color: PlaybookTheme.coolSteel,
+                  color: colors.onSurfaceVariant,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Bloqueado: No cumple quórum mínimo (${bloque.quorumMinimo}/${bloque.totalJugadores})',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: PlaybookTheme.coolSteel,
+                      color: colors.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -227,11 +222,10 @@ class _QuorumStatusBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cumple = bloque.cumpleQuorum;
-    final background =
-        cumple ? const Color(0xFFF0FDF4) : const Color(0xFFFEF2F2);
-    final border = cumple ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA);
-    final foreground =
-        cumple ? const Color(0xFF166534) : const Color(0xFFB91C1C);
+    final colors = Theme.of(context).colorScheme;
+    final foreground = cumple ? PlaybookTheme.success(colors) : colors.error;
+    final background = foreground.withValues(alpha: 0.10);
+    final border = foreground.withValues(alpha: 0.32);
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -275,14 +269,15 @@ class _AbsenceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final badgeStyle = _resolveBadgeStyle(ausencia);
+    final colors = Theme.of(context).colorScheme;
+    final badgeStyle = _resolveBadgeStyle(context, ausencia);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: PlaybookColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: PlaybookColors.border),
+        border: Border.all(color: colors.outlineVariant),
       ),
       child: Row(
         children: <Widget>[
@@ -292,19 +287,16 @@ class _AbsenceCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   ausencia.nombreJugador,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
-                    color: PlaybookTheme.carbon,
+                    color: colors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   ausencia.motivo,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: PlaybookTheme.coolSteel,
-                  ),
+                  style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
                 ),
               ],
             ),
@@ -331,22 +323,27 @@ class _AbsenceCard extends StatelessWidget {
     );
   }
 
-  _AbsenceBadgeStyle _resolveBadgeStyle(AusenciaRegistrada item) {
+  _AbsenceBadgeStyle _resolveBadgeStyle(
+    BuildContext context,
+    AusenciaRegistrada item,
+  ) {
     if (item.esCrucePartido || item.categoriaBadge.contains('PARTIDO')) {
-      return const _AbsenceBadgeStyle(
-        background: Color(0xFFFCE7F3),
-        foreground: Color(0xFF9D174D),
+      final error = Theme.of(context).colorScheme.error;
+      return _AbsenceBadgeStyle(
+        background: error.withValues(alpha: 0.12),
+        foreground: error,
       );
     }
     if (item.categoriaBadge.contains('ACAD')) {
-      return const _AbsenceBadgeStyle(
-        background: Color(0xFFFEF3C7),
-        foreground: Color(0xFF92400E),
+      final warning = PlaybookTheme.warning(Theme.of(context).colorScheme);
+      return _AbsenceBadgeStyle(
+        background: warning.withValues(alpha: 0.12),
+        foreground: warning,
       );
     }
-    return const _AbsenceBadgeStyle(
-      background: PlaybookColors.surfaceMuted,
-      foreground: PlaybookTheme.dustyGrape,
+    return _AbsenceBadgeStyle(
+      background: Theme.of(context).colorScheme.surfaceContainer,
+      foreground: Theme.of(context).colorScheme.primary,
     );
   }
 }
@@ -372,6 +369,7 @@ class _ScheduledPracticeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -386,19 +384,15 @@ class _ScheduledPracticeCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              const Icon(
-                Icons.event_available_rounded,
-                size: 16,
-                color: PlaybookTheme.dustyGrape,
-              ),
+              Icon(Icons.event_available_rounded, size: 16, color: colors.primary),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'Práctica agendada · ${practica.serie.label}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
-                    color: PlaybookTheme.carbon,
+                    color: colors.onSurface,
                   ),
                 ),
               ),
@@ -407,10 +401,10 @@ class _ScheduledPracticeCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             'vs ${practica.rival} (${practica.horaInicio} – ${practica.horaFin})',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: PlaybookTheme.dustyGrape,
+              color: colors.primary,
             ),
           ),
           if (onCancelar != null) ...<Widget>[
@@ -420,7 +414,7 @@ class _ScheduledPracticeCard extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: onCancelar,
                 style: TextButton.styleFrom(
-                  foregroundColor: PlaybookColors.error,
+                  foregroundColor: colors.error,
                   visualDensity: VisualDensity.compact,
                 ),
                 icon: const Icon(Icons.cancel_outlined, size: 16),

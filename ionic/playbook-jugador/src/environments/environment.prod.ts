@@ -1,5 +1,6 @@
+declare const PLAYBOOK_API_URL: string | undefined;
+
 export const environment = {
   production: true,
-  // cambiar al desplegar
-  apiUrl: 'http://localhost:8000/api'
+  apiUrl: typeof PLAYBOOK_API_URL === 'string' ? PLAYBOOK_API_URL : 'http://localhost:8000/api'
 };

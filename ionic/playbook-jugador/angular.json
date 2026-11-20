@@ -65,6 +65,12 @@
               "sourceMap": true,
               "namedChunks": true
             },
+            "laravel": {
+              "baseHref": "/jugador/",
+              "define": {
+                "PLAYBOOK_API_URL": "\"/api\""
+              }
+            },
             "ci": {
               "progress": false
             }

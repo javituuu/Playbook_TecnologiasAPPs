@@ -1,8 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../../app/theme/playbook_theme.dart';
-
-/// Insignia visual con la paleta "Aqua y uva" para encabezados y acceso.
+/// Símbolo de Playbook junto al nombre de la app.
 class PlaybookBrandMark extends StatelessWidget {
   const PlaybookBrandMark({
     super.key,
@@ -13,32 +11,42 @@ class PlaybookBrandMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Image.asset(
+      'assets/brand/playbook-mark.png',
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(size * 0.28),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[
-            PlaybookTheme.dustyGrape,
-            PlaybookTheme.pearlAqua,
-          ],
-        ),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(
-            color: Color(0x1A222222),
-            blurRadius: 8,
-            offset: Offset(0, 3),
+      color: Theme.of(context).colorScheme.primary,
+      excludeFromSemantics: true,
+    );
+  }
+}
+
+class PlaybookCoachWordmark extends StatelessWidget {
+  const PlaybookCoachWordmark({super.key, required this.fontSize});
+
+  final double fontSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      const TextSpan(
+        children: [
+          TextSpan(text: 'Play'),
+          TextSpan(
+            text: 'book',
+            style: TextStyle(fontWeight: FontWeight.w300),
           ),
+          TextSpan(text: ' Coach'),
         ],
       ),
-      child: Icon(
-        Icons.sports_esports_rounded,
-        color: Colors.white,
-        size: size * 0.54,
+      style: TextStyle(
+        fontFamily: 'League Spartan',
+        fontSize: fontSize,
+        fontWeight: FontWeight.w800,
+        color: Theme.of(context).colorScheme.primary,
       ),
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
     );
   }
 }

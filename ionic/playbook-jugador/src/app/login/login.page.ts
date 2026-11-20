@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,22 +21,16 @@ import { AuthService } from '../services/auth.service';
     IonInput, IonButton, IonIcon, IonSpinner
   ],
 })
-export class LoginPage implements OnInit, OnDestroy {
+export class LoginPage implements OnDestroy {
   email = '';
   password = '';
   cargando = false;
   error = '';
   bloqueadoHasta = 0; // segundos que faltan para poder reintentar (429)
-  listo = false; // true cuando la fuente cargó (o pasó el tiempo máximo)
   private temporizador: any;
 
   constructor(private auth: AuthService, private router: Router, private cdr: ChangeDetectorRef) {
     addIcons({ alertCircleOutline, timeOutline });
-  }
-
-  ngOnInit() {
-    Promise.race([document.fonts?.load('800 44px "League Spartan"'), new Promise(r => setTimeout(r, 300))])
-      .finally(() => { this.listo = true; this.cdr.detectChanges(); });
   }
 
   async entrar() {
