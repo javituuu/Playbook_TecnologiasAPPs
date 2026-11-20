@@ -32,9 +32,11 @@ class AuthUser {
             ? null
             : rawAvatar.toString().trim();
 
+    final contexto = json['contexto'];
     final rawEquipos = json['equipos_dirigidos'] ??
         json['equiposDirigidos'] ??
-        json['equipos'];
+        json['equipos'] ??
+        (contexto is Map ? contexto['equipos_dirigidos'] : null);
     final equipos = <EquipoDirigido>[];
     if (rawEquipos is List) {
       for (final item in rawEquipos) {

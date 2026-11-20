@@ -36,7 +36,7 @@ class Env {
   /// Habilita el modo mock de arranque mientras se completa el backend del coach.
   static const bool useMockData = bool.fromEnvironment(
     'USE_MOCK_DATA',
-    defaultValue: true,
+    defaultValue: false,
   );
 
   /// Construye un [Uri] combinando [baseUrl] (o [apiBaseUrl]), [path] y [queryParameters].

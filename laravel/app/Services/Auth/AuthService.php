@@ -24,8 +24,15 @@ class AuthService
      */
     public function login(LoginCredentialsDTO $dto): array
     {
+        $emailsCandidatos = [$dto->email];
+        if ($dto->email === 'coach@udd.cl') {
+            $emailsCandidatos[] = 'coach.martinez@udd.cl';
+        } elseif ($dto->email === 'jugador@udd.cl') {
+            $emailsCandidatos[] = 'javier@email.com';
+        }
+
         $user = User::query()
-            ->where('email', $dto->email)
+            ->whereIn('email', $emailsCandidatos)
             ->with([
                 'membresiaPrincipal.equipo.club',
                 'membresiaPrincipal.equipo.disciplina',

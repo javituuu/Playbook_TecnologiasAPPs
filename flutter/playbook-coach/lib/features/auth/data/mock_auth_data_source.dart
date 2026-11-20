@@ -84,7 +84,11 @@ class MockAuthDataSource implements AuthDataSource {
     final isValidCoachPassword =
         trimmedPassword == demoCoachPassword || trimmedPassword == 'coach1234';
 
-    if (normalizedEmail == demoCoachEmail && isValidCoachPassword) {
+    final isValidCoachEmail = normalizedEmail == demoCoachEmail ||
+        normalizedEmail == 'coach.martinez@udd.cl' ||
+        normalizedEmail == 'coach.rojas@udd.cl';
+
+    if (isValidCoachEmail && isValidCoachPassword) {
       _currentUser = demoCoachUser;
       return const AuthSession(
         token: '${mockTokenPrefix}coach-martinez',
