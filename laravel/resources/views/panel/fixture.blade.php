@@ -324,7 +324,7 @@
             <div class="campo">
                 <label for="formato_serie">Formato de serie</label>
                 <select id="formato_serie" name="formato_serie" class="control">
-                    @foreach (\App\Enums\FormatoSerieEnum::cases() as $fmt)
+                    @foreach (\App\Domain\Enums\FormatoSerieEnum::cases() as $fmt)
                         <option value="{{ $fmt->value }}" @selected($fmt === $formatoSeleccionado)>
                             {{ $fmt->label() }}
                         </option>

@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Torneos;
 
-use App\DTOs\Torneos\ProgramarPartidoDTO;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\FormatoSerieEnum;
-use App\Enums\TipoPartidoEnum;
+use App\Application\DTOs\Torneos\ProgramarPartidoDTO;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\FormatoSerieEnum;
+use App\Domain\Enums\TipoPartidoEnum;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

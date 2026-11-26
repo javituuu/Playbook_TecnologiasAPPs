@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Citaciones;
 
-use App\Enums\EstadoCitacionEnum;
+use App\Domain\Enums\EstadoCitacionEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

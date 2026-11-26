@@ -2,17 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\FormatoSerieEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Enums\TipoConflictoEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\FormatoSerieEnum;
+use App\Domain\Enums\RolMembresiaEnum;
+use App\Domain\Enums\TipoConflictoEnum;
 use App\Models\Equipo;
 use App\Models\EquipoJugador;
 use App\Models\Liga;
 use App\Models\Partido;
 use App\Models\User;
-use App\Services\Disponibilidad\MotorConflictosService;
+use App\Application\Services\Disponibilidad\MotorConflictosService;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

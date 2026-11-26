@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Auth;
 
-use App\Enums\UserRoleEnum;
+use App\Domain\Enums\UserRoleEnum;
 use App\Models\Club;
 use App\Models\Equipo;
 use App\Models\Liga;

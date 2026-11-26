@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Enums\UserRoleEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\RolMembresiaEnum;
+use App\Domain\Enums\UserRoleEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;

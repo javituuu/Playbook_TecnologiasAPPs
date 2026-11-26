@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\DTOs\Auth\LoginCredentialsDTO;
-use App\Enums\UserRoleEnum;
+use App\Application\DTOs\Auth\LoginCredentialsDTO;
+use App\Domain\Enums\UserRoleEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

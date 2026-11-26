@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Enums\DiaSemanaEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\RolMembresiaEnum;
+use App\Domain\Enums\DiaSemanaEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\RolMembresiaEnum;
 use App\Http\Resources\Jugador\AgendaPartidoResource;
 use App\Http\Resources\Jugador\CitacionResource;
 use App\Http\Resources\Jugador\PerfilJugadorResource;

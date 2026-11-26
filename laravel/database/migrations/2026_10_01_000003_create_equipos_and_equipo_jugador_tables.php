@@ -1,7 +1,7 @@
 <?php
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\RolMembresiaEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\RolMembresiaEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\FormatoSerieEnum;
+use App\Domain\Enums\FormatoSerieEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

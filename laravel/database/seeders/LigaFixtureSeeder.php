@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Enums\EstadoCitacionEnum;
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoLigaEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Enums\TipoPartidoEnum;
+use App\Domain\Enums\EstadoCitacionEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\EstadoLigaEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\RolMembresiaEnum;
+use App\Domain\Enums\TipoPartidoEnum;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

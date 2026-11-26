@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Enums\DiaSemanaEnum;
+use App\Domain\Enums\DiaSemanaEnum;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

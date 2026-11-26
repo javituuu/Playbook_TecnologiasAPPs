@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\RolMembresiaEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\RolMembresiaEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

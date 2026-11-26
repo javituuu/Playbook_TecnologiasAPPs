@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\FormatoSerieEnum;
-use App\Enums\TipoPartidoEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\FormatoSerieEnum;
+use App\Domain\Enums\TipoPartidoEnum;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Enums\UserRoleEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\RolMembresiaEnum;
+use App\Domain\Enums\UserRoleEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

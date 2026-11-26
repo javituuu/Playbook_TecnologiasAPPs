@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoLigaEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\EstadoLigaEnum;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

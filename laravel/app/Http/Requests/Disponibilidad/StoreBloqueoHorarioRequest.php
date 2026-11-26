@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Disponibilidad;
 
-use App\DTOs\Disponibilidad\CrearBloqueoHorarioDTO;
-use App\Enums\DiaSemanaEnum;
+use App\Application\DTOs\Disponibilidad\CrearBloqueoHorarioDTO;
+use App\Domain\Enums\DiaSemanaEnum;
 use App\Models\BloqueoHorario;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;

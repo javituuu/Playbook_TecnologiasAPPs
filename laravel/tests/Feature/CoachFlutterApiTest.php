@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Enums\EstadoCitacionEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\RolMembresiaEnum;
+use App\Domain\Enums\EstadoCitacionEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\RolMembresiaEnum;
 use App\Models\Citacion;
 use App\Models\Equipo;
 use App\Models\Partido;

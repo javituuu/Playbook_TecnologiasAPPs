@@ -77,8 +77,8 @@
                             ->take(2)
                             ->join('');
                         $iconoRol = match ($cuenta->role) {
-                            \App\Enums\UserRoleEnum::ADMIN_LIGA => 'trophy-outline',
-                            \App\Enums\UserRoleEnum::ADMIN_CLUB => 'shield-outline',
+                            \App\Domain\Enums\UserRoleEnum::ADMIN_LIGA => 'trophy-outline',
+                            \App\Domain\Enums\UserRoleEnum::ADMIN_CLUB => 'shield-outline',
                             default => 'person-circle-outline',
                         };
                     @endphp
@@ -95,9 +95,9 @@
                             </div>
                             <span class="tenue font-grotesk tarjeta-cuenta__email">{{ $cuenta->email }}</span>
                             <p class="tarjeta-cuenta__desc">
-                                @if ($cuenta->role === \App\Enums\UserRoleEnum::ADMIN_LIGA)
+                                @if ($cuenta->role === \App\Domain\Enums\UserRoleEnum::ADMIN_LIGA)
                                     Crea y programa ligas universitarias, resuelve choques de horario y publica el fixture oficial.
-                                @elseif ($cuenta->role === \App\Enums\UserRoleEnum::ADMIN_CLUB)
+                                @elseif ($cuenta->role === \App\Domain\Enums\UserRoleEnum::ADMIN_CLUB)
                                     Administra {{ $cuenta->clubesAdministrados->pluck('nombre')->join(', ') ?: 'su club' }}, gestiona los planteles y define titulares y suplentes.
                                 @else
                                     Coordina {{ $cuenta->equiposDirigidos->pluck('nombre')->join(', ') ?: 'su equipo' }}, revisa la disponibilidad semanal y confirma la alineación.

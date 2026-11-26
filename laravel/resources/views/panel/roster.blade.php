@@ -50,7 +50,7 @@
                 @foreach ($posiciones as $posicion)
                     @php
                         $titular = $titulares->get(strtoupper($posicion));
-                        $candidatos = $titular ? collect() : $resto->filter(fn ($m) => $m->estado_invitacion !== \App\Enums\EstadoInvitacionEnum::RECHAZADA
+                        $candidatos = $titular ? collect() : $resto->filter(fn ($m) => $m->estado_invitacion !== \App\Domain\Enums\EstadoInvitacionEnum::RECHAZADA
                             && $m->puedeCubrirPosicion($posicion));
 
                         $nombreJugador = $titular?->jugador?->name;
@@ -101,7 +101,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="posicion_principal" value="{{ $titular->posicion_principal }}">
-                                        <input type="hidden" name="rol_membresia" value="{{ \App\Enums\RolMembresiaEnum::SUPLENTE->value }}">
+                                        <input type="hidden" name="rol_membresia" value="{{ \App\Domain\Enums\RolMembresiaEnum::SUPLENTE->value }}">
                                         <input type="hidden" name="estado_invitacion" value="{{ $titular->estado_invitacion->value }}">
                                         <button type="submit" class="boton boton--secundario boton--compacto boton--ancho">
                                             Bajar a suplente
@@ -121,8 +121,8 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     <input type="hidden" name="posicion_principal" value="{{ $posicion }}">
-                                                    <input type="hidden" name="rol_membresia" value="{{ \App\Enums\RolMembresiaEnum::TITULAR->value }}">
-                                                    <input type="hidden" name="estado_invitacion" value="{{ \App\Enums\EstadoInvitacionEnum::ACEPTADA->value }}">
+                                                    <input type="hidden" name="rol_membresia" value="{{ \App\Domain\Enums\RolMembresiaEnum::TITULAR->value }}">
+                                                    <input type="hidden" name="estado_invitacion" value="{{ \App\Domain\Enums\EstadoInvitacionEnum::ACEPTADA->value }}">
                                                     <button type="submit" class="boton boton--primario boton--compacto boton--ancho">
                                                         Asignar a {{ $candidato->jugador?->name }}
                                                     </button>
@@ -215,13 +215,13 @@
                                 <td data-label="Acciones">
                                     @if ($membresia->jugador && ($puedeGestionarRoster ?? true))
                                         <div class="acciones-roster">
-                                            @if ($membresia->rol_membresia !== \App\Enums\RolMembresiaEnum::TITULAR || $membresia->estado_invitacion !== \App\Enums\EstadoInvitacionEnum::ACEPTADA)
+                                            @if ($membresia->rol_membresia !== \App\Domain\Enums\RolMembresiaEnum::TITULAR || $membresia->estado_invitacion !== \App\Domain\Enums\EstadoInvitacionEnum::ACEPTADA)
                                                 <form method="POST" action="{{ route('equipos.roster.update', [$equipo, $membresia->user_id]) }}">
                                                     @csrf
                                                     @method('PATCH')
                                                     <input type="hidden" name="posicion_principal" value="{{ $membresia->posicion_principal ?? ($posiciones[0] ?? 'SUPPORT') }}">
-                                                    <input type="hidden" name="rol_membresia" value="{{ \App\Enums\RolMembresiaEnum::TITULAR->value }}">
-                                                    <input type="hidden" name="estado_invitacion" value="{{ \App\Enums\EstadoInvitacionEnum::ACEPTADA->value }}">
+                                                    <input type="hidden" name="rol_membresia" value="{{ \App\Domain\Enums\RolMembresiaEnum::TITULAR->value }}">
+                                                    <input type="hidden" name="estado_invitacion" value="{{ \App\Domain\Enums\EstadoInvitacionEnum::ACEPTADA->value }}">
                                                     <button type="submit" class="boton boton--primario boton--compacto">
                                                         Subir a titular ({{ $membresia->posicion_principal ?? 'Asignar' }})
                                                     </button>
@@ -240,7 +240,7 @@
                                                 </select>
 
                                                 <select name="rol_membresia" class="control control--compacto" aria-label="Rol en el equipo">
-                                                    @foreach (\App\Enums\RolMembresiaEnum::cases() as $rolCase)
+                                                    @foreach (\App\Domain\Enums\RolMembresiaEnum::cases() as $rolCase)
                                                         <option value="{{ $rolCase->value }}" @selected($membresia->rol_membresia === $rolCase)>
                                                             {{ ucfirst(str_replace('_', ' ', $rolCase->value)) }}
                                                         </option>
@@ -248,7 +248,7 @@
                                                 </select>
 
                                                 <select name="estado_invitacion" class="control control--compacto" aria-label="Estado de invitación">
-                                                    @foreach (\App\Enums\EstadoInvitacionEnum::cases() as $invCase)
+                                                    @foreach (\App\Domain\Enums\EstadoInvitacionEnum::cases() as $invCase)
                                                         <option value="{{ $invCase->value }}" @selected($membresia->estado_invitacion === $invCase)>
                                                             {{ ucfirst($invCase->value) }}
                                                         </option>
@@ -451,7 +451,7 @@
                 <form method="GET" action="{{ route('equipos.show', $equipo) }}#matriz-disponibilidad" class="form-en-linea">
                     <input type="date" name="semana" value="{{ $semanaSeleccionada }}" class="control control--compacto" aria-label="Semana">
                     <select name="formato_serie" class="control control--compacto" aria-label="Formato de serie">
-                        @foreach (\App\Enums\FormatoSerieEnum::cases() as $fmt)
+                        @foreach (\App\Domain\Enums\FormatoSerieEnum::cases() as $fmt)
                             <option value="{{ $fmt->value }}" @selected($fmt === $formatoSeleccionado)>
                                 {{ strtoupper($fmt->value) }} ({{ $fmt->maxPartidas() * $minutosSeleccionados }}m)
                             </option>

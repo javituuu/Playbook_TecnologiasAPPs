@@ -1,9 +1,9 @@
 <?php
 
-use App\Enums\EstadoCitacionEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Enums\TipoPartidoEnum;
+use App\Domain\Enums\EstadoCitacionEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\RolMembresiaEnum;
+use App\Domain\Enums\TipoPartidoEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

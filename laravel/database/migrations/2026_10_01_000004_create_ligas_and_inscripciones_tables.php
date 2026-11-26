@@ -1,7 +1,7 @@
 <?php
 
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoLigaEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\EstadoLigaEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

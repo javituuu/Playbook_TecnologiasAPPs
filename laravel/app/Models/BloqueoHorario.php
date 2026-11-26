@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\DiaSemanaEnum;
+use App\Domain\Enums\DiaSemanaEnum;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;

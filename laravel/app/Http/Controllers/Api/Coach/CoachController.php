@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\Coach;
 
-use App\Enums\DiaSemanaEnum;
-use App\Enums\EstadoCitacionEnum;
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\FormatoSerieEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Enums\TipoPartidoEnum;
-use App\Enums\UserRoleEnum;
+use App\Domain\Enums\DiaSemanaEnum;
+use App\Domain\Enums\EstadoCitacionEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\FormatoSerieEnum;
+use App\Domain\Enums\RolMembresiaEnum;
+use App\Domain\Enums\TipoPartidoEnum;
+use App\Domain\Enums\UserRoleEnum;
 use App\Http\Controllers\Controller;
 use App\Models\BloqueoHorario;
 use App\Models\Citacion;
@@ -17,7 +17,7 @@ use App\Models\Equipo;
 use App\Models\EquipoJugador;
 use App\Models\Partido;
 use App\Models\User;
-use App\Services\Disponibilidad\MotorConflictosService;
+use App\Application\Services\Disponibilidad\MotorConflictosService;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Http\JsonResponse;

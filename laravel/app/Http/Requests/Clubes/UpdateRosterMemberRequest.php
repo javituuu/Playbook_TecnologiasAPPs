@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Clubes;
 
-use App\DTOs\Clubes\ActualizarMiembroRosterDTO;
-use App\Enums\RolMembresiaEnum;
+use App\Application\DTOs\Clubes\ActualizarMiembroRosterDTO;
+use App\Domain\Enums\RolMembresiaEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

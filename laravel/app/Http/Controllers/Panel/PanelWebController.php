@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Panel;
 
-use App\DTOs\Torneos\ProgramarPartidoDTO;
-use App\Enums\EstadoCitacionEnum;
-use App\Enums\EstadoInvitacionEnum;
-use App\Enums\EstadoPartidoEnum;
-use App\Enums\FormatoSerieEnum;
-use App\Enums\RolMembresiaEnum;
-use App\Enums\UserRoleEnum;
+use App\Application\DTOs\Torneos\ProgramarPartidoDTO;
+use App\Domain\Enums\EstadoCitacionEnum;
+use App\Domain\Enums\EstadoInvitacionEnum;
+use App\Domain\Enums\EstadoPartidoEnum;
+use App\Domain\Enums\FormatoSerieEnum;
+use App\Domain\Enums\RolMembresiaEnum;
+use App\Domain\Enums\UserRoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Clubes\UpdateRosterMemberRequest;
 use App\Http\Requests\Torneos\StorePartidoRequest;
@@ -21,7 +21,7 @@ use App\Models\InscripcionLiga;
 use App\Models\Liga;
 use App\Models\Partido;
 use App\Models\User;
-use App\Services\Disponibilidad\MotorConflictosService;
+use App\Application\Services\Disponibilidad\MotorConflictosService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

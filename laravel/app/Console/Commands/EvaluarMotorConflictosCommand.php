@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Enums\FormatoSerieEnum;
+use App\Domain\Enums\FormatoSerieEnum;
 use App\Models\Equipo;
 use App\Models\Liga;
-use App\Services\Disponibilidad\MotorConflictosService;
+use App\Application\Services\Disponibilidad\MotorConflictosService;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 
